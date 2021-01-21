@@ -1,0 +1,41 @@
+# This is an example mods.toml file. It contains the data relating to the loading mods.
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+
+modLoader="javafml" 
+loaderVersion="[35,)" 
+license="All rights reserved, only 989onan can distribute source code."
+
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+
+[[mods]] 
+modId="followingcarmod" 
+version="1.0"
+displayName="FollowingCarMod"
+
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+logoFile="examplemod.png"
+
+credits="Thank you to TurtyWurty and many others!"
+authors="989onan"
+
+
+description='''
+This mod was made by 989onan#0794. This is my first mod, so it is garbage. 
+I made this as my many other garbage mods to satisfy my needs of making random crap involving cars.
+Enjoy?
+Also contact me on discord if you want the source code to try to make your own mod. :P
+'''
+
+
+[[dependencies.followingcarmod]]
+    modId="forge"
+    mandatory=true
+    versionRange="[35,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.followingcarmod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.4,1.17)"
+    ordering="NONE"
+    side="BOTH"

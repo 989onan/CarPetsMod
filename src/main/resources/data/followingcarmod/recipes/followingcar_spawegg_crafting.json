@@ -1,0 +1,33 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        "II ",
+        "I F",
+        "LGL"
+    ],
+    "key":
+    {
+        "L":
+        {
+            "item": "minecraft:leather"
+        },
+        "I":
+        {
+            "item": "minecraft:iron_block"
+        },
+        "G":
+        {
+        	"item": "followingcarmod:gascan"
+        },
+        "F":
+        {
+        	"item": "minecraft:glass_pane"
+        }
+    },
+    "result":
+    {
+        "item": "followingcarmod:followingcar_spawnegg",
+        "count": 1
+    }
+}

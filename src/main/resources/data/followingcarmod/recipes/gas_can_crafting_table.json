@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":[
+        "II ",
+        "CCI",
+        "CCI"
+    ],
+    "key": {
+        "C":
+	      {
+	        "item": "minecraft:coal"
+	      },
+        "I":{
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result":
+    {
+        "item": "followingcarmod:gascan",
+        "count": 4
+    }
+}

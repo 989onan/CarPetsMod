@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "followingcarmod:block/chassis" }
+    }
+}
