@@ -171,7 +171,27 @@ public class FollowingCar extends TameableEntity{
 		
 	}
 	     
-	     
+	@Override
+	public boolean onLivingFall(float distance, float damageMultiplier) {
+	      if (distance > 3F) {
+	         //this.playSound(SoundEvents.ENTITY_HORSE_LAND, 0.4F, 1.0F); don't have a suspension crack or clang effect... or I'm just lazy..
+	      }
+
+	      int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
+	      if (i <= 0) {
+	         return false;
+	      } else {
+	         this.attackEntityFrom(DamageSource.FALL, (float)i);
+	         if (this.isBeingRidden()) {
+	            for(Entity entity : this.getRecursivePassengers()) {
+	               entity.attackEntityFrom(DamageSource.FALL, (float)i);
+	            }
+	         }
+
+	         this.playFallSound();
+	         return true;
+	      }
+	   }
 	     
 	
 	//end controlling car block
