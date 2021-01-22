@@ -159,11 +159,10 @@ public class FollowingCar extends TameableEntity{
 			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(0);
 			
 			
-	    	float f = livingentity.moveForward;
+	    		float f = livingentity.moveForward;
 			f *= 2F;
 			this.setRotation(this.getPassengers().get(0).getRotationYawHead(), 0F);
-			Vector3d motion = new Vector3d((double)(MathHelper.sin(-this.rotationYaw * ((float)Math.PI / 180F)) * f), 0.0D, (double)(MathHelper.cos(this.rotationYaw * ((float)Math.PI / 180F)) * f));
-			this.setMotion(motion);
+			Vector3d motion = new Vector3d(0.0D, 0.0D, f));
 			super.travel(motion);
 		}
 		else {
