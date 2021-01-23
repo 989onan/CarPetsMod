@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipe;
 import followingcar.common.items.itemsmaster;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

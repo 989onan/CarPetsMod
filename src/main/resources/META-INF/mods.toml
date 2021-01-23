@@ -9,7 +9,7 @@ license="All rights reserved, only 989onan can distribute source code."
 
 [[mods]] 
 modId="followingcarmod" 
-version="1.0"
+version="1.0.1"
 displayName="FollowingCarMod"
 
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional

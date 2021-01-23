@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 
 
+
+
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.entity.ai.goal.SitGoal;
@@ -15,6 +17,7 @@ import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.IRideable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
@@ -32,6 +35,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -40,11 +44,10 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public class FollowingCar extends TameableEntity{
+public class FollowingCar extends TameableEntity implements IRideable{
 	private static final Ingredient TAMING_ITEMS = Ingredient.fromItems(itemsmaster.GASCAN);
 	private static final DataParameter<Integer> COLOR = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> TYPE = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT); //<-- this is prep for adding more car models in the future
-	private static final DataParameter<Boolean> DATA_ID_CHEST = EntityDataManager.createKey(FollowingCar.class, DataSerializers.BOOLEAN);
 	public float jumpPower;
 	
 	
@@ -155,43 +158,44 @@ public class FollowingCar extends TameableEntity{
 	public void travel(Vector3d travelVector) {
 		
 		if (this.isBeingRidden()) {
-			
+			this.stepHeight = 1F;
 			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(0);
 			
 			
-	    		float f = livingentity.moveForward;
-			f *= 2F;
+	    	float f = livingentity.moveForward;
 			this.setRotation(this.getPassengers().get(0).getRotationYawHead(), 0F);
-			Vector3d motion = new Vector3d(0.0D, 0.0D, f));
+			Vector3d motion = new Vector3d(0,0,f);
+			float prevspeed = this.getAIMoveSpeed();
+			this.setAIMoveSpeed(Math.abs(f));
 			super.travel(motion);
+			this.setAIMoveSpeed(prevspeed);
 		}
 		else {
 			super.travel(travelVector);
 		}
 		
 	}
-	     
 	@Override
 	public boolean onLivingFall(float distance, float damageMultiplier) {
-	      if (distance > 3F) {
-	         //this.playSound(SoundEvents.ENTITY_HORSE_LAND, 0.4F, 1.0F); don't have a suspension crack or clang effect... or I'm just lazy..
-	      }
+      if (distance > 3F) {
+         //this.playSound(SoundEvents.ENTITY_HORSE_LAND, 0.4F, 1.0F); don't have a suspension crack or clang effect... or I'm just lazy..
+      }
+      int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
+      if (i <= 0) {
+         return false;
+      } else {
+         this.attackEntityFrom(DamageSource.FALL, (float)i);
+         if (this.isBeingRidden()) {
+            for(Entity entity : this.getRecursivePassengers()) {
+               entity.attackEntityFrom(DamageSource.FALL, (float)i);
+            }
+         }
 
-	      int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
-	      if (i <= 0) {
-	         return false;
-	      } else {
-	         this.attackEntityFrom(DamageSource.FALL, (float)i);
-	         if (this.isBeingRidden()) {
-	            for(Entity entity : this.getRecursivePassengers()) {
-	               entity.attackEntityFrom(DamageSource.FALL, (float)i);
-	            }
-	         }
-
-	         this.playFallSound();
-	         return true;
-	      }
-	   }
+         this.playFallSound();
+         return true;
+      }
+   }
+     
 	     
 	
 	//end controlling car block
@@ -207,9 +211,9 @@ public class FollowingCar extends TameableEntity{
 	}
 	@Override
 	protected void registerGoals() {
-		this.goalSelector.addGoal(0, new TemptGoal(this, .5D, TAMING_ITEMS, true));
-		this.goalSelector.addGoal(1, new FollowOwnerGoal(this, .5D, 10F, 5F, false));
-		this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, .5D, 1.0000001E-5F));
+		this.goalSelector.addGoal(0, new TemptGoal(this, 1D, TAMING_ITEMS, true));
+		this.goalSelector.addGoal(1, new FollowOwnerGoal(this, 1D, 10F, 5F, false));
+		this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1D, 1.0000001E-5F));
 		//this.goalSelector.addGoal(3, new LookAtGoal(this, PlayerEntity.class, 10.0F));
 		this.goalSelector.addGoal(1, new SitGoal(this));
 	}
@@ -217,6 +221,7 @@ public class FollowingCar extends TameableEntity{
 	@Override
 	public ILivingEntityData onInitialSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
 		this.dataManager.set(COLOR,this.rand.nextInt(10));
+		this.setAIMoveSpeed(1F);
 		//this.dataManager.set(TYPE, this.rand.nextInt(3)); <-- this is prep for adding more car models in the future
 		return spawnDataIn;
 	}
@@ -237,7 +242,7 @@ public class FollowingCar extends TameableEntity{
    }
    public void writeAdditional(CompoundNBT compound) {
 	      super.writeAdditional(compound);
-	      compound.putInt("Type", getCarType());
+	      //compound.putInt("Type", getCarType());
 	      compound.putByte("Color", (byte)this.getColor().getId());
    }
    
@@ -286,6 +291,26 @@ public class FollowingCar extends TameableEntity{
 	      public boolean shouldExecute() {
 	    	  return super.shouldExecute() && !this.car.isTamed();
 	      }
+	}
+
+
+	@Override
+	public boolean boost() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void travelTowards(Vector3d travelVec) {
+		super.travel(travelVec);
+	}
+
+
+	@Override
+	public float getMountedSpeed() {
+		// TODO Auto-generated method stub
+		return (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.225F;
 	}
 
 
