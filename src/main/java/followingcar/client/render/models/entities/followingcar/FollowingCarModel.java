@@ -154,7 +154,7 @@ public class FollowingCarModel extends EntityModel<FollowingCar> {
 		this.setRotateAngle(wheelrr, limbSwing/1.1F, 0.0f, 0.0f);
 		this.setRotateAngle(wheelrl, limbSwing/1.1F, 0.0f, 0.0f);
 		this.setRotateAngle(Chassis, 0F, 0F, 0F);
-		if(entityIn.isSitting()) {
+		if(entityIn.isEntitySleeping()) {
 			//rotate wheels if sitting
 			this.setRotateAngle(wheelfl, limbSwing/1.1F, 0.0f, 0.6f);
 			this.setRotateAngle(wheelfr, limbSwing/1.1F, 0.0f, -0.6f);
@@ -164,14 +164,19 @@ public class FollowingCarModel extends EntityModel<FollowingCar> {
 			this.setRotateAngle(Chassis, -.05F, 0F, 0F);
 		}
 		
-		//angle reference sheet, doesn't do anything really
-		float rotationaxis = 0.0F;
 		
-		this.setRotateAngle(doorfl, 0.0F, rotationaxis, 0.0F);
-		this.setRotateAngle(doorrl, 0.0F, rotationaxis, 0.0F);
-		this.setRotateAngle(doorfr, 0.0F, rotationaxis, 0.0F);
-		this.setRotateAngle(doorrr, 0.0F, rotationaxis, 0.0F);
+		this.setRotateAngle(doorfr, 0, (float)(entityIn.GetOpenDoorTime()[0]*(Math.PI/180)),0);
+		this.setRotateAngle(doorfl, 0, (float)(-entityIn.GetOpenDoorTime()[1]*(Math.PI/180)),0);
+		this.setRotateAngle(doorrr, 0, (float)(entityIn.GetOpenDoorTime()[2]*(Math.PI/180)),0);
+		this.setRotateAngle(doorrl, 0, (float)(-entityIn.GetOpenDoorTime()[3]*(Math.PI/180)),0);
+		//angle reference sheet, doesn't do anything really
+		//float rotationaxis = 0.0F;
+		
+		//this.setRotateAngle(doorfl, 0.0F, rotationaxis, 0.0F);
+		//this.setRotateAngle(doorrl, 0.0F, rotationaxis, 0.0F);
+		//this.setRotateAngle(doorfr, 0.0F, rotationaxis, 0.0F);
+		//this.setRotateAngle(doorrr, 0.0F, rotationaxis, 0.0F);
 
-		this.setRotateAngle(Lid, rotationaxis, 0.0F, 0.0F);
+		//this.setRotateAngle(Lid, rotationaxis, 0.0F, 0.0F);
 	}
 }

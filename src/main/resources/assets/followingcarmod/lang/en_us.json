@@ -1,5 +1,8 @@
 {
 	"item.followingcarmod.followingcar_spawnegg": "Car Pet",
 	"item.followingcarmod.gascan": "Gas Can",
+	"item.followingcarmod.soul": "Soul",
+	"item.followingcarmod.wheel": "Wheel",
 	"entity.followingcarmod.following_car": "Car Pet"
+	
 }

@@ -1,0 +1,11 @@
+{
+	"type": "blasting",
+	"ingredient":{
+		"item":"minecraft:soul_sand"
+		
+	},
+	"result":{
+		"item":"followingcarmod:soul",
+		"count":1
+	}
+}

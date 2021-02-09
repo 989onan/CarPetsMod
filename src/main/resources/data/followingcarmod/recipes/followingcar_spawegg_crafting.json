@@ -2,15 +2,15 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-        "II ",
-        "I F",
-        "LGL"
+        "LIL",
+        "GSF",
+        "LIL"
     ],
     "key":
     {
         "L":
         {
-            "item": "minecraft:leather"
+            "item": "followingcarmod:wheel"
         },
         "I":
         {
@@ -23,6 +23,9 @@
         "F":
         {
         	"item": "minecraft:glass_pane"
+        },
+        "S":{
+        	"item": "followingcarmod:soul"
         }
     },
     "result":

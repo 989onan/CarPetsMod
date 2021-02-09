@@ -5,14 +5,11 @@ package followingcar.common.entities;
 
 import javax.annotation.Nullable;
 
-
-
-
-
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.entity.ai.goal.SitGoal;
 import followingcar.common.items.itemsmaster;
+import followingcar.config.FollowingCarConfig;
 import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -48,10 +45,17 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	private static final Ingredient TAMING_ITEMS = Ingredient.fromItems(itemsmaster.GASCAN);
 	private static final DataParameter<Integer> COLOR = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> TYPE = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT); //<-- this is prep for adding more car models in the future
-	public float jumpPower;
+	private int[] openDoorTime = {
+			0,0,
+			0,0};
+	
+	public int[] GetOpenDoorTime() {
+		return this.openDoorTime;
+	}
 	
 	
-	//taming the car / claiming it as your own
+	
+	//taming the car / claiming it as your own / riding car
 	@Override
 	public ActionResultType func_230254_b_(PlayerEntity actor, Hand playerhand) {
 		 ItemStack itemstack = actor.getHeldItem(playerhand);
@@ -89,6 +93,7 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	            	if(this.isSitting()) {
 	            		this.func_233687_w_(false);
 	            	}
+	            	openDoor(this.getPassengers().size()+1);
 	          	  return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
 	          	  
 	            }
@@ -112,6 +117,12 @@ public class FollowingCar extends TameableEntity implements IRideable{
              
              return ActionResultType.func_233537_a_(this.world.isRemote);
           }
+
+
+	private void openDoor(int size) {
+		// TODO Auto-generated method stub
+		this.openDoorTime[size-1] = 80;
+	}
 
 
 	public void setColor(DyeColor color) {
@@ -144,31 +155,70 @@ public class FollowingCar extends TameableEntity implements IRideable{
 
 		         Vector3d vector3d = (new Vector3d((double)y, 0D, x)).rotateYaw(-this.renderYawOffset * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
 		         passenger.setPosition(this.getPosX() + vector3d.x, this.getPosY()-.2, this.getPosZ() + vector3d.z);
-		         passenger.setRotationYawHead(this.rotationYaw);
-		         this.applyYawToEntity(passenger);
-		         if (passenger instanceof LivingEntity) {
-		             ((LivingEntity)passenger).renderYawOffset = this.renderYawOffset;
-		          }
-
+		         
 		      }
 	   }
+	
+	//opening door animation timer
+	
+	
+	
+	
 	
 	//moving car with player
 	@Override
 	public void travel(Vector3d travelVector) {
 		
 		if (this.isBeingRidden()) {
+			for(int i=0;i<(this.openDoorTime.length-1);i++) {
+				if(this.openDoorTime[i] > 0) {
+					this.openDoorTime[i] -= 4;
+				}
+			}
 			this.stepHeight = 1F;
 			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(0);
-			
-			
+			Vector3d motion = new Vector3d(0,0,0);
 	    	float f = livingentity.moveForward;
-			this.setRotation(this.getPassengers().get(0).getRotationYawHead(), 0F);
-			Vector3d motion = new Vector3d(0,0,f);
-			float prevspeed = this.getAIMoveSpeed();
-			this.setAIMoveSpeed(Math.abs(f));
-			super.travel(motion);
-			this.setAIMoveSpeed(prevspeed);
+	    	
+	    	//this code makes the car speed up and slow down if old movement is disabled. Else, use old movement.
+	    	float speed = this.getAIMoveSpeed();
+	    	if(!FollowingCarConfig.oldmovement.get()) {
+	    		if(f != 0.0F) {
+	    			if(speed < 0.01F) {
+		    			speed = 0.01F;
+		    		}
+	    			if(speed < 1.1 && f>0) {
+	    				speed += 0.02F;
+	    			}else if(speed < .3 && f<0) {
+	    				speed += 0.02F;
+	    			}
+	    			this.setRotation(livingentity.getRotationYawHead(), 0F);
+	    			
+	    		}
+	    		else if(f == 0.0F){
+	    			speed -= .05F;
+	    			if(speed < 0.01F) {
+		    			speed = 0F;
+		    		}
+
+			        f=0.98F;
+	    		}
+	    		
+	    		motion = new Vector3d(0,0,f);
+				
+				this.setAIMoveSpeed(Math.abs(speed));
+				
+	    	}
+	    	else {//else use simple old movement
+	    		motion = new Vector3d(0,0,f);
+				
+				this.setAIMoveSpeed(Math.abs(f));
+				
+	    	}
+	    	
+	    	super.travel(motion);
+			
+			
 		}
 		else {
 			super.travel(travelVector);

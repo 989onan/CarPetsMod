@@ -3,7 +3,6 @@ package followingcar.core.init;
 
 
 import net.minecraft.block.Block;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import followingcar.common.items.itemsmaster;
@@ -14,13 +13,18 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class Registries {
 	
+	
+	
+	
 	@SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> Registry) {
     	//register spawn eggs for entities
 		EntityTypeInit.RegisterEntitySpawnEggs(Registry);
 		//register items
 		Registry.getRegistry().registerAll(
-				itemsmaster.GASCAN
+				itemsmaster.GASCAN,
+				itemsmaster.SOUL,
+				itemsmaster.WHEEL
 		);
     }
 	
@@ -40,5 +44,6 @@ public class Registries {
 		e.getRegistry().registerAll(
 				EntityTypeInit.FOLLOWING_CAR
 				);
+		//MainFollowingCar.LOGGER.info("trying to get loottables for "+EntityTypeInit.FOLLOWING_CAR.getName()+" from: "+EntityTypeInit.FOLLOWING_CAR.getLootTable().toString());
 	}
 }
