@@ -3,13 +3,18 @@ package followingcar.common.entities;
 
 
 
+
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 
+
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.SitGoal;
 import followingcar.common.items.itemsmaster;
 import followingcar.config.FollowingCarConfig;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -31,13 +36,21 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.FlyingPathNavigator;
+import net.minecraft.pathfinding.GroundPathNavigator;
+import net.minecraft.pathfinding.PathNavigator;
+import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.pathfinding.WalkNodeProcessor;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -47,7 +60,8 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	private static final DataParameter<Integer> TYPE = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT); //<-- this is prep for adding more car models in the future
 	private int[] openDoorTime = {
 			0,0,
-			0,0};
+			0,0
+	};
 	
 	public int[] GetOpenDoorTime() {
 		return this.openDoorTime;
@@ -89,14 +103,11 @@ public class FollowingCar extends TameableEntity implements IRideable{
                   
                }
             if(!actor.isSneaking()){
-	            if(!(this.getPassengers().size() >= 4)) {
-	            	if(this.isSitting()) {
-	            		this.func_233687_w_(false);
-	            	}
-	            	openDoor(this.getPassengers().size()+1);
-	          	  return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
-	          	  
-	            }
+            	if(this.isSitting()) {
+            		this.func_233687_w_(false);
+            	}
+            	openDoor(this.getPassengers().size()+1);
+            	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
             }
             else {
             	this.func_233687_w_(!this.isSitting());
@@ -118,7 +129,11 @@ public class FollowingCar extends TameableEntity implements IRideable{
              return ActionResultType.func_233537_a_(this.world.isRemote);
           }
 
-
+	@Override
+	public boolean canFitPassenger(Entity passenger) {
+	      return this.getPassengers().size() < 4 && !this.areEyesInFluid(FluidTags.WATER);
+	   }
+	
 	private void openDoor(int size) {
 		// TODO Auto-generated method stub
 		this.openDoorTime[size-1] = 80;
@@ -134,7 +149,6 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	
 	
 	//fixing passenger position:
-	
 	protected void applyYawToEntity(Entity entityToUpdate) {
 	      entityToUpdate.setRenderYawOffset(this.rotationYaw);
 	      float f = MathHelper.wrapDegrees(entityToUpdate.rotationYaw - this.rotationYaw);
@@ -315,6 +329,151 @@ public class FollowingCar extends TameableEntity implements IRideable{
 		return null;
 	}
 	
+	
+	static class FollowOwnerGoal extends net.minecraft.entity.ai.goal.FollowOwnerGoal{
+		
+		 private final TameableEntity tameable;
+		   private LivingEntity owner;
+		   @SuppressWarnings("unused")
+		private final IWorldReader world;
+		   private final double followSpeed;
+		   private final PathNavigator navigator;
+		   private int timeToRecalcPath;
+		   private final float maxDist;
+		   private final float minDist;
+		   private float oldWaterCost;
+		   @SuppressWarnings("unused")
+		private final boolean teleportToLeaves;
+		   
+		   /**
+		    * Returns whether an in-progress EntityAIBase should continue executing
+		    */
+		   public boolean shouldContinueExecuting() {
+		      if (this.navigator.noPath()) {
+		         return false;
+		      } else if (this.tameable.isSitting()) {
+		         return false;
+		      } else {
+		         return !(this.tameable.getDistanceSq(this.owner) <= (double)(this.maxDist * this.maxDist));
+		      }
+		   }
+
+		   /**
+		    * Execute a one shot task or start executing a continuous task
+		    */
+		   public void startExecuting() {
+		      this.timeToRecalcPath = 0;
+		      this.oldWaterCost = this.tameable.getPathPriority(PathNodeType.WATER);
+		      this.tameable.setPathPriority(PathNodeType.WATER, 0.0F);
+		   }
+
+		   /**
+		    * Reset the task's internal state. Called when this task is interrupted by another one
+		    */
+		   public void resetTask() {
+		      this.owner = null;
+		      this.navigator.clearPath();
+		      this.tameable.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
+		   }
+
+		public FollowOwnerGoal(TameableEntity tameable, double speed, float minDist, float maxDist,
+				boolean teleportToLeaves) {
+			super(tameable, speed, minDist, maxDist, teleportToLeaves);
+			this.tameable = tameable;
+		      this.world = tameable.world;
+		      this.followSpeed = speed;
+		      this.navigator = tameable.getNavigator();
+		      this.minDist = minDist;
+		      this.maxDist = maxDist;
+		      this.teleportToLeaves = teleportToLeaves;
+		      this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+		      if (!(tameable.getNavigator() instanceof GroundPathNavigator) && !(tameable.getNavigator() instanceof FlyingPathNavigator)) {
+		         throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
+		      }
+		}
+		
+		
+		@Override
+		public boolean shouldExecute() {
+		      LivingEntity livingentity = this.tameable.getOwner();
+		      if (livingentity == null) {
+		         return false;
+		      } else if (livingentity.isSpectator()) {
+		         return false;
+		      } else if (this.tameable.isSitting()) {
+		         return false;
+		      } else if (this.tameable.getDistanceSq(livingentity) < (double)(this.minDist * this.minDist)) {
+		         return false;
+		      } else if (this.tameable.getPassengers().size() > 0) {
+		    	  return false;
+		      }
+		      else {
+		         this.owner = livingentity;
+		         return true;
+		      }
+		   }
+		@Override
+		public void tick() {
+		      //this.tameable.getLookController().setLookPositionWithEntity(this.owner, 10.0F, (float)this.tameable.getVerticalFaceSpeed());
+		      if (--this.timeToRecalcPath <= 0) {
+		         this.timeToRecalcPath = 10;
+		         if (!this.tameable.getLeashed() && !this.tameable.isPassenger()) {
+		            if (this.tameable.getDistanceSq(this.owner) >= 144.0D) {
+		               this.tryToTeleportNearEntity();
+		            } else {
+		               this.navigator.tryMoveToEntityLiving(this.owner, this.followSpeed);
+		            }
+
+		         }
+		      }
+		   }
+
+		   private void tryToTeleportNearEntity() {
+		      BlockPos blockpos = this.owner.getPosition();
+
+		      for(int i = 0; i < 10; ++i) {
+		         int j = this.getRandomNumber(-3, 3);
+		         int k = this.getRandomNumber(-1, 1);
+		         int l = this.getRandomNumber(-3, 3);
+		         boolean flag = this.tryToTeleportToLocation(blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
+		         if (flag) {
+		            return;
+		         }
+		      }
+
+		   }
+
+		   private boolean tryToTeleportToLocation(int x, int y, int z) {
+		      if (Math.abs((double)x - this.owner.getPosX()) < 2.0D && Math.abs((double)z - this.owner.getPosZ()) < 2.0D) {
+		         return false;
+		      } else if (!this.isTeleportFriendlyBlock(new BlockPos(x, y, z))) {
+		         return false;
+		      } else {
+		         this.tameable.setLocationAndAngles((double)x + 0.5D, (double)y, (double)z + 0.5D, this.tameable.rotationYaw, this.tameable.rotationPitch);
+		         this.navigator.clearPath();
+		         return true;
+		      }
+		   }
+
+		   private boolean isTeleportFriendlyBlock(BlockPos pos) {
+		      PathNodeType pathnodetype = WalkNodeProcessor.func_237231_a_(this.world, pos.toMutable());
+		      if (pathnodetype != PathNodeType.WALKABLE) {
+		         return false;
+		      } else {
+		         BlockState blockstate = this.world.getBlockState(pos.down());
+		         if (!this.teleportToLeaves && blockstate.getBlock() instanceof LeavesBlock) {
+		            return false;
+		         } else {
+		            BlockPos blockpos = pos.subtract(this.tameable.getPosition());
+		            return this.world.hasNoCollisions(this.tameable, this.tameable.getBoundingBox().offset(blockpos));
+		         }
+		      }
+		   }
+
+		   private int getRandomNumber(int min, int max) {
+		      return this.tameable.getRNG().nextInt(max - min + 1) + min;
+		   }
+	}
 	
 	static class TemptGoal extends net.minecraft.entity.ai.goal.TemptGoal {
 	      @Nullable

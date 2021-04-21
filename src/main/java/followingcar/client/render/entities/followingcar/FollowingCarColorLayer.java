@@ -15,8 +15,6 @@ public class FollowingCarColorLayer extends LayerRenderer<FollowingCar, Followin
 	private static final ResourceLocation CAR_COLOR = MainFollowingCar.Location("textures/entities/livingcarcolor.png");
 	public FollowingCarColorLayer(IEntityRenderer<FollowingCar, FollowingCarModel> entityRendererIn) {
 		super(entityRendererIn);
-		
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

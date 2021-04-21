@@ -164,11 +164,13 @@ public class FollowingCarModel extends EntityModel<FollowingCar> {
 			this.setRotateAngle(Chassis, -.05F, 0F, 0F);
 		}
 		
-		
+		//rotate doors to current door angle on entity
 		this.setRotateAngle(doorfr, 0, (float)(entityIn.GetOpenDoorTime()[0]*(Math.PI/180)),0);
 		this.setRotateAngle(doorfl, 0, (float)(-entityIn.GetOpenDoorTime()[1]*(Math.PI/180)),0);
 		this.setRotateAngle(doorrr, 0, (float)(entityIn.GetOpenDoorTime()[2]*(Math.PI/180)),0);
 		this.setRotateAngle(doorrl, 0, (float)(-entityIn.GetOpenDoorTime()[3]*(Math.PI/180)),0);
+		
+		
 		//angle reference sheet, doesn't do anything really
 		//float rotationaxis = 0.0F;
 		
