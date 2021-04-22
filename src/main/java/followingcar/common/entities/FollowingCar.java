@@ -5,6 +5,7 @@ package followingcar.common.entities;
 
 
 import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 
@@ -63,6 +64,8 @@ public class FollowingCar extends TameableEntity implements IRideable{
 			0,0
 	};
 	
+	//private final int seats = 4; //how many seats the car has. Can be changed in a new kind of vehicle that has 6 or even 100 seats.
+	
 	public int[] GetOpenDoorTime() {
 		return this.openDoorTime;
 	}
@@ -102,15 +105,24 @@ public class FollowingCar extends TameableEntity implements IRideable{
                   
                   
                }
-            if(!actor.isSneaking()){
-            	if(this.isSitting()) {
-            		this.func_233687_w_(false);
+            
+            if(!actor.isSneaking()){//if the person who right clicked it is not sneaking
+            	if(this.isSitting()) { //and the car is sitting
+            		if(this.isOwner(actor)) { //and the person who right clicked it is the owner of the car
+            			this.func_233687_w_(false); //then make it stand up and put the owner in the car
+            			openDoor(this.getPassengers().size()+1);
+                    	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            		}
             	}
-            	openDoor(this.getPassengers().size()+1);
-            	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            	else { //if it is not sitting, allow someone in no matter the person.
+            		openDoor(this.getPassengers().size()+1);
+                	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            	}
             }
-            else {
-            	this.func_233687_w_(!this.isSitting());
+            else { //if they are sneaking, aka trying to get it to stand
+            	if(this.isOwner(actor)) { //only make the car stand if it is the owner.
+            		this.func_233687_w_(!this.isSitting());
+            	}
             }
             return ActionResultType.func_233537_a_(this.world.isRemote);
 	             
@@ -163,13 +175,19 @@ public class FollowingCar extends TameableEntity implements IRideable{
 		      if (this.isPassenger(passenger)) {
 		    	  
 		    	  //takes passengers in rows of 2, infinitely backward. This can easily be modified for a bus with more on each row.
-		    	  int i = this.getPassengers().indexOf(passenger);
+		    	   //
+		    	  
+		    	  int i = this.getPassengers().indexOf(passenger); //get where the passenger is
+		    	  
+		    	  int count = this.getPassengers().size(); //get how many passengers there are
+		    	  
+		    	  i = Math.abs(i-(count-1)); //reverse it so the first passenger would be in the last available instead
+		    	  
 		         float y = ((((int)(i/2)))*-1.1F)  + .5F;
 		         float x = (float) ((Math.floorMod(i, 2)-.5));
 
 		         Vector3d vector3d = (new Vector3d((double)y, 0D, x)).rotateYaw(-this.renderYawOffset * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
 		         passenger.setPosition(this.getPosX() + vector3d.x, this.getPosY()-.2, this.getPosZ() + vector3d.z);
-		         
 		      }
 	   }
 	
@@ -190,7 +208,8 @@ public class FollowingCar extends TameableEntity implements IRideable{
 				}
 			}
 			this.stepHeight = 1F;
-			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(0);
+			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(this.getPassengers().size()-1);//make the last passenger the controlling one, but since the display of the passenger...
+			//positions is shifted, the person that is visually the first is the one controlling.
 			Vector3d motion = new Vector3d(0,0,0);
 	    	float f = livingentity.moveForward;
 	    	
@@ -263,7 +282,12 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	     
 	
 	//end controlling car block
-	
+		
+	//have to have some way of getting rid of a protected! ;)
+	@Override
+	 public void onKillCommand() {
+	      this.remove();
+	 }
 	
 	
 	public FollowingCar(EntityType<? extends TameableEntity> type, World worldIn) {
@@ -501,6 +525,12 @@ public class FollowingCar extends TameableEntity implements IRideable{
 	    	  return super.shouldExecute() && !this.car.isTamed();
 	      }
 	}
+	
+	//make it so that car behaves as if it can fall far distances.
+	@Override
+	public int getMaxFallHeight() {
+	      return 5;
+	   }
 
 
 	@Override
