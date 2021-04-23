@@ -3,6 +3,7 @@ package followingcar;
 
 import java.util.ArrayList;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -28,6 +30,14 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+
+/*
+	DO THESE BEFORE UPLOADING (to @989onan): 
+	1. change the build.gradle file to reflect version number
+	2. 
+	
+	
+*/
 
 @Mod("followingcarmod")
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -91,10 +101,12 @@ public class MainFollowingCar {
     			//yes, this is buggy. I don't care. Just keep your bed not covered.
     			try {
     				if(!(entityfollowing.world.isRemote)) {
-    					if(entityfollowing.getOwner().getBedPosition().isPresent()) {
+    					if(entityfollowing.getOwner().getBedPosition().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
+    						entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
     						entityfollowing.teleportKeepLoaded(entityfollowing.getOwner().getBedPosition().get().getX(), entityfollowing.getOwner().getBedPosition().get().getY()+1, entityfollowing.getOwner().getBedPosition().get().getZ());
     					}
-    					else {//doesn't work.
+    					else {
+    						entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
     						entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
         					entityfollowing.func_233687_w_(true);
     					}
@@ -102,7 +114,8 @@ public class MainFollowingCar {
     			}
     			catch(Exception e) {
     				//also keep your spawn area free...
-    				//doesn't work.
+    				//doesn't run for some reason.
+    				entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
     				entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
 					entityfollowing.func_233687_w_(true);
     			}
@@ -110,9 +123,10 @@ public class MainFollowingCar {
     			
     			//send fake death message
     			if (!entityfollowing.world.isRemote && entityfollowing.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && entityfollowing.getOwner() instanceof ServerPlayerEntity) {
-    		         //entityfollowing.getOwner().sendMessage(entityfollowing.getCombatTracker().getDeathMessage(), Util.DUMMY_UUID);
+    		         //entityfollowing.getOwner().sendMessage(entityfollowing.getCombatTracker().getDeathMessage(), Util.DUMMY_UUID); //isn't needed because it already sends death message.
     		         entityfollowing.getOwner().sendMessage(new StringTextComponent(entityfollowing.getCustomName().getString()+" respawned at world spawn point!"), Util.DUMMY_UUID);
     			}
+    			
     			
     			
     		}
