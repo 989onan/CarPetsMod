@@ -102,11 +102,11 @@ public class MainFollowingCar {
     			try {
     				if(!(entityfollowing.world.isRemote)) {
     					if(entityfollowing.getOwner().getBedPosition().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
-    						entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
+    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
     						entityfollowing.teleportKeepLoaded(entityfollowing.getOwner().getBedPosition().get().getX(), entityfollowing.getOwner().getBedPosition().get().getY()+1, entityfollowing.getOwner().getBedPosition().get().getZ());
     					}
     					else {
-    						entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
+    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
     						entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
         					entityfollowing.func_233687_w_(true);
     					}
@@ -115,7 +115,7 @@ public class MainFollowingCar {
     			catch(Exception e) {
     				//also keep your spawn area free...
     				//doesn't run for some reason.
-    				entityfollowing = (FollowingCar) entityfollowing.changeDimension(entityfollowing.getServer().getWorld(World.OVERWORLD));
+    				entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
     				entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
 					entityfollowing.func_233687_w_(true);
     			}
@@ -133,7 +133,19 @@ public class MainFollowingCar {
     	}
     	
     }
-    
+	@SuppressWarnings("unchecked")
+	private <T extends Entity> T changeDimension(T entity,ServerWorld dim) {
+	return (T) entity.changeDimension(dim, new ITeleporter()
+	{
+	    @Override
+	    public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
+	    {
+		Entity repositionedEntity = repositionEntity.apply(false);
+		repositionedEntity.setPositionAndUpdate(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+		return repositionedEntity;
+	    }
+	});
+	}
     
     
     public static ResourceLocation Location(String name) {
