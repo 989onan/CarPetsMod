@@ -13,6 +13,10 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/car-pets" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="followingcaricon.png"
 
+#needed so that people know when to update
+updateJSONURL= "https://github.com/989onan/CarPetsMod/blob/main/updates.json"
+
+
 credits="Myself of course. Oh yeah, and Tablua for model making: https://www.curseforge.com/minecraft/mc-mods/tabula-minecraft-modeler"
 authors="989onan"
 
@@ -31,12 +35,12 @@ https://www.curseforge.com/minecraft/mc-mods/car-pets
 [[dependencies.followingcarmod]]
     modId="forge"
     mandatory=true
-    versionRange="[35,)"
+    versionRange="[37,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.followingcarmod]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4,1.17)"
+    versionRange="[1.17,1.18)"
     ordering="NONE"
     side="BOTH"

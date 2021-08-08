@@ -2,34 +2,39 @@ package followingcar;
 
 
 import java.util.ArrayList;
-
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import followingcar.client.render.FollowingCarRenderRegistry;
 import followingcar.common.entities.FollowingCar;
+import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.config.FollowingCarConfig;
 import followingcar.core.init.EntityTypeInit;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 
 /*
 	DO THESE BEFORE UPLOADING (to @989onan): 
@@ -38,6 +43,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 	
 	
 */
+
+
 
 @Mod("followingcarmod")
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -62,13 +69,15 @@ public class MainFollowingCar {
 			add("Amay-Lia");
 			add("Chokuto");
 			add("Makibishi");
+			add("Hibiki");
+			add("Kadrian");
 		}
 	};
 	
     
     public MainFollowingCar() {
     	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-    	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientRegistries);
+    	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::renderregister);
     	FollowingCarConfig.loadConfig(FollowingCarConfig.config, FMLPaths.CONFIGDIR.get().resolve("car-pets-config.toml").toString());
     	//EntityTypeInit.ENTITIES.register(bus); <-- Doesn't work
         MinecraftForge.EVENT_BUS.register(this);
@@ -78,8 +87,8 @@ public class MainFollowingCar {
     @SubscribeEvent
     public void hurtevent(LivingHurtEvent event)
     {
-        if(event.getEntity().getRidingEntity() instanceof FollowingCar) {
-        	if(event.getSource().getDamageType() == "inWall"){
+        if(event.getEntity().getVehicle() instanceof FollowingCar) {
+        	if(event.getSource() == DamageSource.IN_WALL){
         		event.setCanceled(true);//if entity took damage from suffocating while in FollowingCar, cancel event.
         	}      	
         }
@@ -91,74 +100,92 @@ public class MainFollowingCar {
     	LivingEntity entity = event.getEntityLiving();
     	if(entity instanceof FollowingCar) {
     		FollowingCar entityfollowing = ((FollowingCar)entity);
-    		if(MainFollowingCar.protectednames.contains(entityfollowing.getCustomName().getString()) && (!(event.getSource() == DamageSource.OUT_OF_WORLD))) {
-    			event.setCanceled(true);
-    			//PlayerEntity owner = (PlayerEntity) entityfollowing.getOwner();//get the owner
-    			
-    			entityfollowing.setHealth(entityfollowing.getMaxHealth());
-    			
-    			
-    			//yes, this is buggy. I don't care. Just keep your bed not covered.
-    			try {
-    				if(!(entityfollowing.world.isRemote)) {
-    					if(entityfollowing.getOwner().getBedPosition().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
-    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
-    						entityfollowing.teleportKeepLoaded(entityfollowing.getOwner().getBedPosition().get().getX(), entityfollowing.getOwner().getBedPosition().get().getY()+1, entityfollowing.getOwner().getBedPosition().get().getZ());
+    		if(entityfollowing.getCustomName() != null) {
+	    		if(MainFollowingCar.protectednames.contains(entityfollowing.getCustomName().getString()) && (!(event.getSource() == DamageSource.OUT_OF_WORLD))) {
+	    			event.setCanceled(true);
+	    			//PlayerEntity owner = (PlayerEntity) entityfollowing.getOwner();//get the owner
+	    			
+	    			entityfollowing.setHealth(entityfollowing.getMaxHealth());
+	    			
+	    			//yes, this is buggy. I don't care. Just keep your bed not covered.
+    				LOGGER.info("Current dimension: "+entityfollowing.level.dimension().toString()+" destination dimension: "+Level.OVERWORLD.toString()+" Do they not Equal each other? "+!(entityfollowing.level.dimension() == Level.OVERWORLD));
+    				if((!(entityfollowing.level.isClientSide)) && !(entityfollowing.level.dimension() == Level.OVERWORLD)) {
+    					if(entityfollowing.getOwner() != null) {
+	    					if(entityfollowing.getOwner().getSleepingPos().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
+	    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getLevel(Level.OVERWORLD));
+	    						entityfollowing.teleportTo(entityfollowing.getOwner().getSleepingPos().get().getX(), entityfollowing.getOwner().getSleepingPos().get().getY()+1, entityfollowing.getOwner().getSleepingPos().get().getZ());
+	    						entityfollowing.setOrderedToSit(true);
+	    					}
     					}
     					else {
-    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
-    						entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
-        					entityfollowing.func_233687_w_(true);
+    						entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().overworld());
+    						entityfollowing.teleportTo(entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getZSpawn());
+        					entityfollowing.setOrderedToSit(true);
     					}
     				}
-    			}
-    			catch(Exception e) {
-    				//also keep your spawn area free...
-    				//doesn't run for some reason.
-    				entityfollowing = changeDimension(entityfollowing,entityfollowing.getServer().getWorld(World.OVERWORLD));
-    				entityfollowing.teleportKeepLoaded(entityfollowing.world.getWorldInfo().getSpawnX(),entityfollowing.world.getWorldInfo().getSpawnY(),entityfollowing.world.getWorldInfo().getSpawnZ());
-					entityfollowing.func_233687_w_(true);
-    			}
-    			
-    			
-    			//send fake death message
-    			if (!entityfollowing.world.isRemote && entityfollowing.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && entityfollowing.getOwner() instanceof ServerPlayerEntity) {
-    		         //entityfollowing.getOwner().sendMessage(entityfollowing.getCombatTracker().getDeathMessage(), Util.DUMMY_UUID); //isn't needed because it already sends death message.
-    		         entityfollowing.getOwner().sendMessage(new StringTextComponent(entityfollowing.getCustomName().getString()+" respawned at world spawn point!"), Util.DUMMY_UUID);
-    			}
-    			
-    			
-    			
+    				else if(!(entityfollowing.level.isClientSide)) {
+    					if(entityfollowing.getOwner() != null) {
+	    					if(entityfollowing.getOwner().getSleepingPos().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
+	    						entityfollowing.teleportTo(entityfollowing.getOwner().getSleepingPos().get().getX(), entityfollowing.getOwner().getSleepingPos().get().getY()+1, entityfollowing.getOwner().getSleepingPos().get().getZ());
+	    						entityfollowing.setOrderedToSit(true);
+	    					}
+	    					else {
+	    						entityfollowing.teleportTo(entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getZSpawn());
+	        					entityfollowing.setOrderedToSit(true);
+	    					}
+    					}
+    					else {
+    						entityfollowing.teleportTo(entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getYSpawn(),entityfollowing.level.getLevelData().getZSpawn());
+        					entityfollowing.setOrderedToSit(true);
+    					}
+    				}
+	    			
+	    			
+	    			//send fake death message
+	    			if (!entityfollowing.level.isClientSide && entityfollowing.level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && entityfollowing.getOwner() instanceof ServerPlayer) {
+	    		         //entityfollowing.getOwner().sendMessage(entityfollowing.getCombatTracker().getDeathMessage(), Util.DUMMY_UUID); //isn't needed because it already sends death message.
+	    		         entityfollowing.getOwner().sendMessage(new TextComponent(entityfollowing.getCustomName().getString()+" respawned at world spawn point!"), Util.NIL_UUID);
+	    			}
+	    			
+	    			
+	    			
+	    		}
     		}
     	}
     	
     }
-	@SuppressWarnings("unchecked")
-	private <T extends Entity> T changeDimension(T entity,ServerWorld dim) {
-	return (T) entity.changeDimension(dim, new ITeleporter()
-	{
-	    @Override
-	    public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
-	    {
-		Entity repositionedEntity = repositionEntity.apply(false);
-		repositionedEntity.setPositionAndUpdate(entity.getPosX(), entity.getPosY(), entity.getPosZ());
-		return repositionedEntity;
-	    }
-	});
+    
+    
+    
+    @SuppressWarnings("unchecked")
+	private <T extends Entity> T changeDimension(T entity,ServerLevel dim) {
+    	return (T) entity.changeDimension(dim, new ITeleporter()
+        {
+            @Override
+            public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
+            {
+                Entity repositionedEntity = repositionEntity.apply(false);
+                repositionedEntity.setPos(entity.position().x, entity.position().y, entity.position().z);
+                repositionedEntity.setUUID(Mth.createInsecureUUID());
+                return repositionedEntity;
+            }
+        });
 	}
-    
-    
-    public static ResourceLocation Location(String name) {
+
+	public static ResourceLocation Location(String name) {
     	return new ResourceLocation(MODID,name);
     }
-	private void setup(final FMLCommonSetupEvent event)
+	
+	
+	@SubscribeEvent
+	public void setup(final EntityAttributeCreationEvent event)
 	{
-    	GlobalEntityTypeAttributes.put((EntityType<? extends LivingEntity>) EntityTypeInit.FOLLOWING_CAR, FollowingCar.setCustomAttributes().create());
+		event.put((EntityType<? extends LivingEntity>)EntityTypeInit.FOLLOWING_CAR, FollowingCar.setCustomAttributes());
     }
 	
-	
-	private void clientRegistries(final FMLClientSetupEvent event) {
-		FollowingCarRenderRegistry.RegisterEntityRenderers();
-		
+	@SubscribeEvent
+	public void renderregister(final RegisterLayerDefinitions event) {
+		LOGGER.info("Loading Renderers from Following Car!");
+		event.registerLayerDefinition(FollowingCarRenderRegistry.carcolorlayer, ()->FollowingCarModel.createBodyMesh(CubeDeformation.NONE) );
 	}
 }

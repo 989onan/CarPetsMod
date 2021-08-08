@@ -2,9 +2,8 @@ package followingcar.core.init;
 
 
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import followingcar.common.items.itemsmaster;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,7 +31,7 @@ public class Registries {
 	
 	
 	@SubscribeEvent
-	public static void registerBlocks(RegistryEvent.Register<Block> Registry) {
+	public static void registerBlocks(RegistryEvent.Register<net.minecraft.world.level.block.Block> Registry) {
 		Registry.getRegistry().registerAll(
 				
 				);
