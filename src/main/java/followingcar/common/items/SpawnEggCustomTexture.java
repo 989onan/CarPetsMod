@@ -1,6 +1,7 @@
 package followingcar.common.items;
 
 import java.util.Objects;
+
 import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;

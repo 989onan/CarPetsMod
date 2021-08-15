@@ -3,6 +3,7 @@ package followingcar.core.init;
 
 
 import net.minecraft.world.entity.EntityType;
+
 import net.minecraft.world.item.Item;
 import followingcar.common.items.itemsmaster;
 import net.minecraftforge.event.RegistryEvent;

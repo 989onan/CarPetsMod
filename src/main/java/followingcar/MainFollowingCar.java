@@ -2,14 +2,14 @@ package followingcar;
 
 
 import java.util.ArrayList;
+
+
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import followingcar.client.render.FollowingCarRenderRegistry;
 import followingcar.common.entities.FollowingCar;
-import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.config.FollowingCarConfig;
 import followingcar.core.init.EntityTypeInit;
 import net.minecraft.world.entity.Entity;
@@ -20,9 +20,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -76,8 +74,11 @@ public class MainFollowingCar {
 	
     
     public MainFollowingCar() {
+    	
+    	
+    	
+    	
     	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-    	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::renderregister);
     	FollowingCarConfig.loadConfig(FollowingCarConfig.config, FMLPaths.CONFIGDIR.get().resolve("car-pets-config.toml").toString());
     	//EntityTypeInit.ENTITIES.register(bus); <-- Doesn't work
         MinecraftForge.EVENT_BUS.register(this);
@@ -95,8 +96,11 @@ public class MainFollowingCar {
         //else they are not in FollowingCar and taking suffocation damage don't change the damage.
     	
     }
+    
+    
     @SubscribeEvent
     public void onDeath(LivingDeathEvent event) {
+    	
     	LivingEntity entity = event.getEntityLiving();
     	if(entity instanceof FollowingCar) {
     		FollowingCar entityfollowing = ((FollowingCar)entity);
@@ -183,9 +187,5 @@ public class MainFollowingCar {
 		event.put((EntityType<? extends LivingEntity>)EntityTypeInit.FOLLOWING_CAR, FollowingCar.setCustomAttributes());
     }
 	
-	@SubscribeEvent
-	public void renderregister(final RegisterLayerDefinitions event) {
-		LOGGER.info("Loading Renderers from Following Car!");
-		event.registerLayerDefinition(FollowingCarRenderRegistry.carcolorlayer, ()->FollowingCarModel.createBodyMesh(CubeDeformation.NONE) );
-	}
+	
 }
