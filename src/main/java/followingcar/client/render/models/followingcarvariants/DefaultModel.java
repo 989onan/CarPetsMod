@@ -10,8 +10,10 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.phys.Vec3;
-
-public class DefaultModel extends GeneralModelObj{
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+@OnlyIn(Dist.CLIENT)
+public class DefaultModel extends GeneralPartModel{
 	
 	/**
 	 * 
@@ -27,17 +29,15 @@ public class DefaultModel extends GeneralModelObj{
 	 */
 	
 	
-	public void setRotateAngle(ModelPart ModelPart, float x, float y, float z) {
-        ModelPart.xRot = x;
-        ModelPart.yRot = y;
-        ModelPart.zRot = z;
-    }
+	
 	
 	public DefaultModel(ModelPart bakeLayer) {
 		this.put("Chassis", bakeLayer.getChild("Chassis1"));
 		this.Children.put("Lid", this.get("Chassis").getChild("Lid"));
     	this.Children.put("WindowBack",this.get("Chassis").getChild("WindowBack"));
     	this.Children.put("WindshieldModel", this.get("Chassis").getChild("WindshieldModel"));
+    	this.Children.put("Seats",this.get("Chassis").getChild("seats"));
+    	
     	
     	this.Children.put("door1", this.get("Chassis").getChild("doorfr"));
     	this.Children.put("door2", this.get("Chassis").getChild("doorfl"));

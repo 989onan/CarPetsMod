@@ -4,6 +4,7 @@ package followingcar;
 import java.util.ArrayList;
 
 
+
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,7 @@ import net.minecraft.util.Mth;
 /*
 	DO THESE BEFORE UPLOADING (to @989onan): 
 	1. change the build.gradle file to reflect version number
-	2. 
+	2. check mods.toml to make sure it reflects the mod info.
 	
 	
 */
@@ -69,6 +70,7 @@ public class MainFollowingCar {
 			add("Makibishi");
 			add("Hibiki");
 			add("Kadrian");
+			add("Fumei");
 		}
 	};
 	
@@ -112,7 +114,7 @@ public class MainFollowingCar {
 	    			entityfollowing.setHealth(entityfollowing.getMaxHealth());
 	    			
 	    			//yes, this is buggy. I don't care. Just keep your bed not covered.
-    				LOGGER.info("Current dimension: "+entityfollowing.level.dimension().toString()+" destination dimension: "+Level.OVERWORLD.toString()+" Do they not Equal each other? "+!(entityfollowing.level.dimension() == Level.OVERWORLD));
+    				//LOGGER.info("Current dimension: "+entityfollowing.level.dimension().toString()+" destination dimension: "+Level.OVERWORLD.toString()+" Do they not Equal each other? "+!(entityfollowing.level.dimension() == Level.OVERWORLD));
     				if((!(entityfollowing.level.isClientSide)) && !(entityfollowing.level.dimension() == Level.OVERWORLD)) {
     					if(entityfollowing.getOwner() != null) {
 	    					if(entityfollowing.getOwner().getSleepingPos().isPresent()) {//TODO: doesn't run even if the player has a bed spawn point. Maybe I'm using the wrong check? I tried inverse and non inverse of if statement above as well.
@@ -179,7 +181,6 @@ public class MainFollowingCar {
 	public static ResourceLocation Location(String name) {
     	return new ResourceLocation(MODID,name);
     }
-	
 	
 	@SubscribeEvent
 	public void setup(final EntityAttributeCreationEvent event)

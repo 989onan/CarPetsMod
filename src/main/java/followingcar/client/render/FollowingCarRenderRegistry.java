@@ -3,8 +3,6 @@ package followingcar.client.render;
 import java.util.HashMap;
 
 
-import followingcar.MainFollowingCar;
-
 import followingcar.client.render.entities.followingcar.FollowingCarRender;
 import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.core.init.EntityTypeInit;
@@ -32,8 +30,10 @@ public class FollowingCarRenderRegistry {
 
 	{
 		put(0,new ModelLayerLocation(FollowingCarRender.Colortextures.get(0),"DefaultModel"));
-		put(1,new ModelLayerLocation(FollowingCarRender.Colortextures.get(1),"ae86"));
+		//put(1,new ModelLayerLocation(FollowingCarRender.Colortextures.get(1),"ae86"));
+		
 	}};
+	
 	
 	
 	@SubscribeEvent
@@ -45,13 +45,12 @@ public class FollowingCarRenderRegistry {
 	}
 	
 	public FollowingCarRenderRegistry() {
-		MainFollowingCar.LOGGER.info("Hello?");
+		//MainFollowingCar.LOGGER.info("Hello?");
 		
 	}
 	
-	
 	@SubscribeEvent
-	public static void RegisterEntityRenderers(final RegisterRenderers event){
+	public static void RegisterModelRenderers(final RegisterRenderers event){
 		
 		event.registerEntityRenderer(EntityTypeInit.FOLLOWING_CAR, FollowingCarRender::new);
 		

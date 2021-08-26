@@ -240,6 +240,9 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 			if(this.getCarType() == 2) {
 				y-=4/16; //divide by 16 because model is by 16ths of a block.
 			}
+			if(this.getCarType() == 0) {
+				y-=.7;
+			}
 
 			Vec3 vector3d = (new Vec3((double)y, 0.0D, (double)x)).yRot(-(this.getYRot()) * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
 			
@@ -263,7 +266,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 
 
 
-
+	float lastcntrlx = 0.0F;
 	//moving car with player
 	@Override
 	public void travel(Vec3 travelVector) {
@@ -274,8 +277,15 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 			//positions is shifted, the person that is visually the first is the one controlling.
 			Vec3 motion = new Vec3(0,0,0);
 			
+			
+			
+			
 			float cntrlx = livingentity.zza;
 			float cntrly = livingentity.xxa;
+			
+			if(0.8F < Mth.abs(cntrlx)) {
+				lastcntrlx = cntrlx;
+			}
 			
 			//this code makes the car speed up and slow down if old movement is disabled. Else, use old movement.
 			float speed = this.getSpeed();
@@ -294,9 +304,9 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 					
 				}
 				else{
-					speed -= .1F*(Math.abs(speed)/speed);
+					speed -= (((float)(this.clamp(((int)(Math.log(speed+1)*100)), -5, 100))/1000));
 					if(Math.abs(speed) < 0.11F) {
-						speed = 0F;
+						speed = 0.11F;
 					}
 				}
 				
@@ -305,13 +315,13 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 				this.deltarotation = 0;
 				float rotationspeed = ((float)this.clamp(((int)((speed-0.1F)*1000)), 0, 4000))/3900;
 				
-				if(cntrlx != 0) {
-					float newrot = ((((-3.9F*((rotationspeed-0.5F)*(rotationspeed-0.5F))))+1)* /*Max turn angle speed:*/10)*(-cntrly*(Math.abs(cntrlx)/cntrlx));
+				if(cntrly != 0.0F) {
+					float newrot = ((((-3.9F*((rotationspeed-0.5F)*(rotationspeed-0.5F))))+1)* /*Max turn angle speed:*/15)*(-cntrly*(Math.abs(lastcntrlx)/lastcntrlx));
 					
 					this.setYRot(this.getYRot()+newrot);
-					
 					this.deltarotation = newrot/3.1F;
 				}
+				
 				//f *= (Math.abs(speed)/speed);
 				//LOGGER.info(f);
 				motion = new Vec3(0,0,cntrlx);

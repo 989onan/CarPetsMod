@@ -4,6 +4,7 @@ package followingcar.core.init;
 
 import net.minecraft.world.entity.EntityType;
 
+
 import net.minecraft.world.item.Item;
 import followingcar.common.items.itemsmaster;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,9 +34,9 @@ public class Registries {
 	
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<net.minecraft.world.level.block.Block> Registry) {
-		Registry.getRegistry().registerAll(
-				
-				);
+		
+		//these blocks are to be rendered onto an entity using code derived from the mooshroom which uses code to render a block on it's back... 
+		CarBlockTypesMaster.CarObjModels.forEach((i,ModelCollection)->{ModelCollection.forEach((k,Model) ->{Registry.getRegistry().registerAll(Model);});});
 	}
 	
 	
@@ -44,6 +45,6 @@ public class Registries {
 		e.getRegistry().registerAll(
 				EntityTypeInit.FOLLOWING_CAR
 				);
-		//MainFollowingCar.LOGGER.info("trying to get loottables for "+EntityTypeInit.FOLLOWING_CAR.getName()+" from: "+EntityTypeInit.FOLLOWING_CAR.getLootTable().toString());
+		//MainFollowingCar.LOGGER.info("trying to get loot tables for "+EntityTypeInit.FOLLOWING_CAR.getName()+" from: "+EntityTypeInit.FOLLOWING_CAR.getLootTable().toString());
 	}
 }

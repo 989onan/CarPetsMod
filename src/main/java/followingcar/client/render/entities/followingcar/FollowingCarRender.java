@@ -45,13 +45,11 @@ public class FollowingCarRender extends MobRenderer<FollowingCar, FollowingCarMo
 	
 	
 	public static final HashMap<String,Integer> NameToVariant = new HashMap<String,Integer>(){
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -119518255187550602L;
-
 		{
 			put("Kodachi",1);
+			//put("Amari",2); //figure out which model will have Amari's model, later...
+			put("Fumei",2);
 		}
 	};
 	
@@ -59,9 +57,10 @@ public class FollowingCarRender extends MobRenderer<FollowingCar, FollowingCarMo
 	
 	public FollowingCarRender(EntityRendererProvider.Context p_173943_) {
 		super(p_173943_, new FollowingCarModel<>(p_173943_.bakeLayer(FollowingCarRenderRegistry.ModelTextures.get(0))), 1f);
-		this.addLayer(new FollowingCarColorLayer(this,p_173943_.getModelSet()));
+		//this.addLayer(new FollowingCarColorLayer(this,p_173943_.getModelSet()));
+		this.addLayer(new FollowingCarModelLayer(this,p_173943_.getModelSet()));
 	}
-
+	
 	@Override
 	public ResourceLocation getTextureLocation(FollowingCar entity) {
 		String name = ChatFormatting.stripFormatting(entity.getName().getString());
@@ -70,11 +69,14 @@ public class FollowingCarRender extends MobRenderer<FollowingCar, FollowingCarMo
 			return MainFollowingCar.Location("textures/entities/livingcar.png");
 		}
 		else if (NameToVariant.get(name) != null){
-			return maintextures.get(NameToVariant.get(name));
+			if(maintextures.get(NameToVariant.get(name)) != null) {
+				return maintextures.get(NameToVariant.get(name));
+			}
 		}
-		
-		return maintextures.get(entity.getCarType());
-		
+		if(maintextures.get(entity.getCarType()) != null) {
+			return maintextures.get(entity.getCarType());
+		}
+		return MainFollowingCar.Location("textures/entities/livingcar.png");
 	}
 	
 }

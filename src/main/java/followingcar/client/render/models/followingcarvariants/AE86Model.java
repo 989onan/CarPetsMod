@@ -10,8 +10,10 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.phys.Vec3;
-
-public class AE86Model extends GeneralModelObj{
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+@OnlyIn(Dist.CLIENT)
+public class AE86Model extends GeneralPartModel{
 
 	/**
 	 * 
@@ -22,12 +24,6 @@ public class AE86Model extends GeneralModelObj{
 	public HashMap<String,ModelPart> Children = new HashMap<String,ModelPart>();
 	
 	
-	
-	public void setRotateAngle(ModelPart ModelPart, float x, float y, float z) {
-        ModelPart.xRot = x;
-        ModelPart.yRot = y;
-        ModelPart.zRot = z;
-    }
 	
 	/**
 	 * 
@@ -41,11 +37,14 @@ public class AE86Model extends GeneralModelObj{
 		this.Children.put("door1", this.get("Chassis").getChild("doorfr"));
 		this.Children.put("door2", this.get("Chassis").getChild("doorfl"));
 		
+		
 		this.put("wheel-r1", bakeLayer.getChild("wheelfr2"));
 		this.put("wheel-l1" ,bakeLayer.getChild("wheelfl2"));
 		this.put("wheel-l2", bakeLayer.getChild("wheelrl2"));
 		this.put("wheel-r2" ,bakeLayer.getChild("wheelrr2"));
 		
+		
+		this.Children.put("Seats",this.get("Chassis").getChild("seats"));
 		this.Children.put("roof", this.get("Chassis").getChild("roof"));
 		this.Children.put("HeadlightL", this.get("Chassis").getChild("HeadlightL"));
 		this.Children.put("HeadlightR", this.get("Chassis").getChild("HeadlightR"));
