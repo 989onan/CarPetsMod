@@ -1,166 +1,166 @@
 package followingcar.common.items;
 
 import java.util.Objects;
+
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
-import net.minecraft.tileentity.MobSpawnerTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.spawner.AbstractSpawner;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BaseSpawner;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-
-//This makes a spawn egg that has no tint. Allowing for a custom texture.
-//MOST OF THIS IS COPIED FROM VANILLA
-public class SpawnEggCustomTexture extends Item{
-	   private final EntityType<?> typeIn;
-
-	   public SpawnEggCustomTexture(EntityType<?> typeIn,Item.Properties builder) {
+public class SpawnEggCustomTexture extends Item {
+   //private static final Map<EntityType<? extends Mob>, SpawnEggCustomTexture> BY_ID = Maps.newIdentityHashMap();
+   private final EntityType<?> defaultType;
+   
+   public SpawnEggCustomTexture(EntityType<? extends Mob> typeIn,Item.Properties builder) {
 	      super(builder);
-	      this.typeIn = typeIn;
-	   }
-	   
-	   
-	   public ActionResultType onItemUse(ItemUseContext context) {
-	      World world = context.getWorld();
-	      if (!(world instanceof ServerWorld)) {
-	         return ActionResultType.SUCCESS;
-	      } else {
-	         ItemStack itemstack = context.getItem();
-	         BlockPos blockpos = context.getPos();
-	         Direction direction = context.getFace();
-	         BlockState blockstate = world.getBlockState(blockpos);
-	         if (blockstate.isIn(Blocks.SPAWNER)) {
-	            TileEntity tileentity = world.getTileEntity(blockpos);
-	            if (tileentity instanceof MobSpawnerTileEntity) {
-	               AbstractSpawner abstractspawner = ((MobSpawnerTileEntity)tileentity).getSpawnerBaseLogic();
-	               EntityType<?> entitytype1 = this.getType(itemstack.getTag());
-	               abstractspawner.setEntityType(entitytype1);
-	               tileentity.markDirty();
-	               world.notifyBlockUpdate(blockpos, blockstate, blockstate, 3);
-	               itemstack.shrink(1);
-	               return ActionResultType.CONSUME;
-	            }
-	         }
-
-	         BlockPos blockpos1;
-	         if (blockstate.getCollisionShape(world, blockpos).isEmpty()) {
-	            blockpos1 = blockpos;
-	         } else {
-	            blockpos1 = blockpos.offset(direction);
-	         }
-
-	         EntityType<?> entitytype = this.getType(itemstack.getTag());
-	         if (entitytype.spawn((ServerWorld)world, itemstack, context.getPlayer(), blockpos1, SpawnReason.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP) != null) {
-	            itemstack.shrink(1);
-	         }
-
-	         return ActionResultType.CONSUME;
-	      }
-	   }
-	   public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-	      ItemStack itemstack = playerIn.getHeldItem(handIn);
-	      RayTraceResult raytraceresult = rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
-	      if (raytraceresult.getType() != RayTraceResult.Type.BLOCK) {
-	         return ActionResult.resultPass(itemstack);
-	      } else if (!(worldIn instanceof ServerWorld)) {
-	         return ActionResult.resultSuccess(itemstack);
-	      } else {
-	         BlockRayTraceResult blockraytraceresult = (BlockRayTraceResult)raytraceresult;
-	         BlockPos blockpos = blockraytraceresult.getPos();
-	         if (!(worldIn.getBlockState(blockpos).getBlock() instanceof FlowingFluidBlock)) {
-	            return ActionResult.resultPass(itemstack);
-	         } else if (worldIn.isBlockModifiable(playerIn, blockpos) && playerIn.canPlayerEdit(blockpos, blockraytraceresult.getFace(), itemstack)) {
-	            EntityType<?> entitytype = this.getType(itemstack.getTag());
-	            if (entitytype.spawn((ServerWorld)worldIn, itemstack, playerIn, blockpos, SpawnReason.SPAWN_EGG, false, false) == null) {
-	               return ActionResult.resultPass(itemstack);
-	            } else {
-	               if (!playerIn.abilities.isCreativeMode) {
-	                  itemstack.shrink(1);
-	               }
-
-	               playerIn.addStat(Stats.ITEM_USED.get(this));
-	               return ActionResult.resultConsume(itemstack);
-	            }
-	         } else {
-	            return ActionResult.resultFail(itemstack);
-	         }
-	      }
+	      this.defaultType = typeIn;
 	   }
 
-	   public boolean hasType(@Nullable CompoundNBT nbt, EntityType<?> type) {
-	      return Objects.equals(this.getType(nbt), type);
-	   }
+   public InteractionResult useOn(UseOnContext p_43223_) {
+      Level level = p_43223_.getLevel();
+      if (!(level instanceof ServerLevel)) {
+         return InteractionResult.SUCCESS;
+      } else {
+         ItemStack itemstack = p_43223_.getItemInHand();
+         BlockPos blockpos = p_43223_.getClickedPos();
+         Direction direction = p_43223_.getClickedFace();
+         BlockState blockstate = level.getBlockState(blockpos);
+         if (blockstate.is(Blocks.SPAWNER)) {
+            BlockEntity blockentity = level.getBlockEntity(blockpos);
+            if (blockentity instanceof SpawnerBlockEntity) {
+               BaseSpawner basespawner = ((SpawnerBlockEntity)blockentity).getSpawner();
+               EntityType<?> entitytype1 = this.getType(itemstack.getTag());
+               basespawner.setEntityId(entitytype1);
+               blockentity.setChanged();
+               level.sendBlockUpdated(blockpos, blockstate, blockstate, 3);
+               itemstack.shrink(1);
+               return InteractionResult.CONSUME;
+            }
+         }
+
+         BlockPos blockpos1;
+         if (blockstate.getCollisionShape(level, blockpos).isEmpty()) {
+            blockpos1 = blockpos;
+         } else {
+            blockpos1 = blockpos.relative(direction);
+         }
+
+         EntityType<?> entitytype = this.getType(itemstack.getTag());
+         if (entitytype.spawn((ServerLevel)level, itemstack, p_43223_.getPlayer(), blockpos1, MobSpawnType.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP) != null) {
+            itemstack.shrink(1);
+            level.gameEvent(p_43223_.getPlayer(), GameEvent.ENTITY_PLACE, blockpos);
+         }
+
+         return InteractionResult.CONSUME;
+      }
+   }
+
+   public InteractionResultHolder<ItemStack> use(Level p_43225_, Player p_43226_, InteractionHand p_43227_) {
+      ItemStack itemstack = p_43226_.getItemInHand(p_43227_);
+      HitResult hitresult = getPlayerPOVHitResult(p_43225_, p_43226_, ClipContext.Fluid.SOURCE_ONLY);
+      if (hitresult.getType() != HitResult.Type.BLOCK) {
+         return InteractionResultHolder.pass(itemstack);
+      } else if (!(p_43225_ instanceof ServerLevel)) {
+         return InteractionResultHolder.success(itemstack);
+      } else {
+         BlockHitResult blockhitresult = (BlockHitResult)hitresult;
+         BlockPos blockpos = blockhitresult.getBlockPos();
+         if (!(p_43225_.getBlockState(blockpos).getBlock() instanceof LiquidBlock)) {
+            return InteractionResultHolder.pass(itemstack);
+         } else if (p_43225_.mayInteract(p_43226_, blockpos) && p_43226_.mayUseItemAt(blockpos, blockhitresult.getDirection(), itemstack)) {
+            EntityType<?> entitytype = this.getType(itemstack.getTag());
+            if (entitytype.spawn((ServerLevel)p_43225_, itemstack, p_43226_, blockpos, MobSpawnType.SPAWN_EGG, false, false) == null) {
+               return InteractionResultHolder.pass(itemstack);
+            } else {
+               if (!p_43226_.getAbilities().instabuild) {
+                  itemstack.shrink(1);
+               }
+
+               p_43226_.awardStat(Stats.ITEM_USED.get(this));
+               p_43225_.gameEvent(GameEvent.ENTITY_PLACE, p_43226_);
+               return InteractionResultHolder.consume(itemstack);
+            }
+         } else {
+            return InteractionResultHolder.fail(itemstack);
+         }
+      }
+   }
+
+   public boolean spawnsEntity(@Nullable CompoundTag p_43231_, EntityType<?> p_43232_) {
+      return Objects.equals(this.getType(p_43231_), p_43232_);
+   }
 
 
 
-	   public EntityType<?> getType(@Nullable CompoundNBT nbt) {
-	      if (nbt != null && nbt.contains("EntityTag", 10)) {
-	         CompoundNBT compoundnbt = nbt.getCompound("EntityTag");
-	         if (compoundnbt.contains("id", 8)) {
-	            return EntityType.byKey(compoundnbt.getString("id")).orElse(this.typeIn);
-	         }
-	      }
 
-	      return this.typeIn;
-	   }
+   public EntityType<?> getType(@Nullable CompoundTag p_43229_) {
+      if (p_43229_ != null && p_43229_.contains("EntityTag", 10)) {
+         CompoundTag compoundtag = p_43229_.getCompound("EntityTag");
+         if (compoundtag.contains("id", 8)) {
+            return EntityType.byString(compoundtag.getString("id")).orElse(this.defaultType);
+         }
+      }
 
-	   public Optional<MobEntity> getChildToSpawn(PlayerEntity player, MobEntity mob, EntityType<? extends MobEntity> entityType, ServerWorld world, Vector3d pos, ItemStack stack) {
-	      if (!this.hasType(stack.getTag(), entityType)) {
-	         return Optional.empty();
-	      } else {
-	         MobEntity mobentity;
-	         if (mob instanceof AgeableEntity) {
-	            mobentity = ((AgeableEntity)mob).func_241840_a(world, (AgeableEntity)mob);
-	         } else {
-	            mobentity = entityType.create(world);
-	         }
+      return this.defaultType;
+   }
 
-	         if (mobentity == null) {
-	            return Optional.empty();
-	         } else {
-	            mobentity.setChild(true);
-	            if (!mobentity.isChild()) {
-	               return Optional.empty();
-	            } else {
-	               mobentity.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
-	               world.func_242417_l(mobentity);
-	               if (stack.hasDisplayName()) {
-	                  mobentity.setCustomName(stack.getDisplayName());
-	               }
+   public Optional<Mob> spawnOffspringFromSpawnEgg(Player p_43216_, Mob p_43217_, EntityType<? extends Mob> p_43218_, ServerLevel p_43219_, Vec3 p_43220_, ItemStack p_43221_) {
+      if (!this.spawnsEntity(p_43221_.getTag(), p_43218_)) {
+         return Optional.empty();
+      } else {
+         Mob mob;
+         if (p_43217_ instanceof AgeableMob) {
+            mob = ((AgeableMob)p_43217_).getBreedOffspring(p_43219_, (AgeableMob)p_43217_);
+         } else {
+            mob = p_43218_.create(p_43219_);
+         }
 
-	               if (!player.abilities.isCreativeMode) {
-	                  stack.shrink(1);
-	               }
+         if (mob == null) {
+            return Optional.empty();
+         } else {
+            mob.setBaby(true);
+            if (!mob.isBaby()) {
+               return Optional.empty();
+            } else {
+               mob.moveTo(p_43220_.x(), p_43220_.y(), p_43220_.z(), 0.0F, 0.0F);
+               p_43219_.addFreshEntityWithPassengers(mob);
+               if (p_43221_.hasCustomHoverName()) {
+                  mob.setCustomName(p_43221_.getHoverName());
+               }
 
-	               return Optional.of(mobentity);
-	            }
-	         }
-	      }
-	   }
+               if (!p_43216_.getAbilities().instabuild) {
+                  p_43221_.shrink(1);
+               }
+
+               return Optional.of(mob);
+            }
+         }
+      }
+   }
 }

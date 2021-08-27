@@ -1,28 +1,70 @@
 package followingcar.client.render.entities.followingcar;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 
-import followingcar.MainFollowingCar;
+
+
+
+import followingcar.client.render.FollowingCarRenderRegistry;
 import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.common.entities.FollowingCar;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.util.ResourceLocation;
 
-public class FollowingCarColorLayer extends LayerRenderer<FollowingCar, FollowingCarModel>{
+import java.util.HashMap;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import followingcar.core.init.CarBlockTypesMaster;
+
+
+@OnlyIn(Dist.CLIENT)
+public class FollowingCarColorLayer extends RenderLayer<FollowingCar, FollowingCarModel<FollowingCar>>{
 	
-	private static final ResourceLocation CAR_COLOR = MainFollowingCar.Location("textures/entities/livingcarcolor.png");
-	public FollowingCarColorLayer(IEntityRenderer<FollowingCar, FollowingCarModel> entityRendererIn) {
-		super(entityRendererIn);
+	
+	
+	public final HashMap<Integer,EntityModel<FollowingCar>> Models = new HashMap<Integer,EntityModel<FollowingCar>>();
+	
+	public FollowingCarColorLayer(RenderLayerParent<FollowingCar, FollowingCarModel<FollowingCar>> p_174468_, EntityModelSet p_174469_) {
+		super(p_174468_);
+		FollowingCarRenderRegistry.ModelTextures.forEach((k,resource) ->{
+			Models.put(k,new FollowingCarModel<>(p_174469_.bakeLayer(resource)));
+		});
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, FollowingCar entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-	      //if (entitylivingbaseIn.isTamed()) {
-	         float[] afloat = entitylivingbaseIn.getColor().getColorComponentValues();
-	         renderCopyCutoutModel(this.getEntityModel(), new FollowingCarModel(), CAR_COLOR, matrixStackIn, bufferIn, packedLightIn, entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks, afloat[0], afloat[1], afloat[2]);
-	      //}
-	   }
+	public void render(PoseStack p_117349_, MultiBufferSource p_117350_, int p_117351_, FollowingCar entityIn,
+			float p_117353_, float p_117354_, float p_117355_, float p_117356_, float p_117357_, float p_117358_) {
+		float[] afloat = entityIn.getColor().getTextureDiffuseColors();
+		
+		String name = ChatFormatting.stripFormatting(entityIn.getName().getString());
+		
+		
+		//first if statement will run if the model is a missing model
+		if(Models.get(entityIn.getCarType()) == null && FollowingCarRender.NameToVariant.get(name) == null) {
+			coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(0), FollowingCarRender.Colortextures.get(0), p_117349_, p_117350_, p_117351_, entityIn,
+	     			p_117353_, p_117354_,p_117355_, p_117356_, p_117357_, p_117358_,afloat[0], afloat[1], afloat[2]);
+		
+		}
+		else if(FollowingCarRender.NameToVariant.get(name) != null) {
+			if(CarBlockTypesMaster.CarObjModels.get(FollowingCarRender.NameToVariant.get(name)) == null && CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null){
+				coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(FollowingCarRender.NameToVariant.get(name)), FollowingCarRender.Colortextures.get(FollowingCarRender.NameToVariant.get(name)), p_117349_, p_117350_, p_117351_, entityIn,
+		     			p_117353_, p_117354_,p_117355_, p_117356_, p_117357_, p_117358_,afloat[0], afloat[1], afloat[2]);
+			}
+			else {
+				//don't render a color layer from the block models. the obj models take care of this..
+			}
+			
+		}
+		else if (CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null){
+			coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(entityIn.getCarType()), FollowingCarRender.Colortextures.get(entityIn.getCarType()), p_117349_, p_117350_, p_117351_, entityIn,
+	     			p_117353_, p_117354_,p_117355_, p_117356_, p_117357_, p_117358_,afloat[0], afloat[1], afloat[2]);
+		}
+	}
 	
 }

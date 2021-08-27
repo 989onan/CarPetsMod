@@ -1,184 +1,207 @@
 package followingcar.client.render.models.entities.followingcar;
 
-import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+
+
+
+
+
+
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import followingcar.common.entities.FollowingCar;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+
 /**
  * FollowingCar - 989onan
  * Created using Tabula 8.0.0
+ * rewritten randomly by 989onan
  */
-public class FollowingCarModel extends EntityModel<FollowingCar> {
-    public ModelRenderer Chassis;
-    public ModelRenderer Lid;
-    public ModelRenderer WindowBack;
-    public ModelRenderer WindshieldModel;
-    public ModelRenderer doorfl;
-    public ModelRenderer doorrl;
-    public ModelRenderer doorrr;
-    public ModelRenderer doorfr;
-    public ModelRenderer wheelfr;
-    public ModelRenderer wheelfl;
-    public ModelRenderer wheelrl;
-    public ModelRenderer wheelrr;
-    
-    //stores the boxes for every seat.
-    public ModelRenderer seats;
-    
-    //this just stores the 
-    int[] seatTextureLocation = new int[] {100,82};
 
-    public FollowingCarModel() {
-        this.textureWidth = 256;
-        this.textureHeight = 256;
-        this.WindshieldModel = new ModelRenderer(this);
-        this.WindshieldModel.setRotationPoint(16.0F, -3.0F  -18.0F, -6.0F);
-        this.WindshieldModel.setTextureOffset(0, 45+32).addBox(0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 17.0F, 0.0F, 0.0F, 0.0F);
-        this.setRotateAngle(WindshieldModel, -0.5061454830783556F, 3.141592653589793F, 0.0F);
-        this.doorrr = new ModelRenderer(this);
-        this.doorrr.setRotationPoint(16.0F, 6.0F  -18.0F, 1.0F);
-        this.doorrr.setTextureOffset(99+64, 31+32).addBox(-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F, 0.0F, 0.0F, 0.0F);
-        this.doorrl = new ModelRenderer(this);
-        this.doorrl.setRotationPoint(-15.0F, 6.0F  -18.0F, 1.0F);
-        this.doorrl.setTextureOffset(141+64, 12+32).addBox(-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F, 0.0F, 0.0F, 0.0F);
-        this.Lid = new ModelRenderer(this);
-        this.Lid.setRotationPoint(-15.0F, 5.0F  -18.0F, 20.0F);
-        this.Lid.setTextureOffset(0, 28+32).addBox(0.0F, 0.0F, 0.0F, 30.0F, 1.0F, 16.0F, 0.0F, 0.0F, 0.0F);
-        this.WindowBack = new ModelRenderer(this);
-        this.WindowBack.setRotationPoint(-15.9F, -3.0F  -18.0F, 12.0F);
-        this.WindowBack.setTextureOffset(28+64, 31+32).addBox(0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 13.0F, 0.0F, 0.0F, 0.0F);
-        this.setRotateAngle(WindowBack, -0.782431135626991F, 0.0F, 0.0F);
-        this.Chassis = new ModelRenderer(this);
-        this.Chassis.setRotationPoint(0.0F, 18.0F, 0.0F);
-        this.Chassis.addBox(-16.0F, 0.0F, -20.0F, 32.0F, 1.0F, 40.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(104, 0).addBox(-16.0F, -13.0F, -40.0F, 32.0F, 14.0F, 20.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(128, 34).addBox(-16.0F, -12.0F, 20.0F, 32.0F, 13.0F, 16.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.addBox(-16.0F, -13.0F, 20.0F, 1.0F, 1.0F, 16.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(188, 0).addBox(15.0F, -13.0F, 20.0F, 1.0F, 1.0F, 16.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(0, 41).addBox(-16.0F, -21.0F, -6.0F, 32.0F, 1.0F, 18.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(34, 0).addBox(15.0F, -20.0F, 0.0F, 1.0F, 20.0F, 1.0F, 0.0F, 0.0F, 0.0F);
-        this.Chassis.setTextureOffset(222, 0).addBox(-16.0F, -20.0F, 0.0F, 1.0F, 20.0F, 1.0F, 0.0F, 0.0F, 0.0F);
-        this.doorfl = new ModelRenderer(this);
-        this.doorfl.setRotationPoint(-15.0F, 6.0F  -18.0F, -20.0F);
-        this.doorfl.setTextureOffset(144+64, 1).addBox(-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F, 0.0F, 0.0F, 0.0F);
-        this.doorfr = new ModelRenderer(this);
-        this.doorfr.setRotationPoint(16.0F, 6.0F  -18.0F, -20.0F);
-        this.doorfr.setTextureOffset(119+64, 43+32).addBox(-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F, 0.0F, 0.0F, 0.0F);
-        
-        //wheels
-        this.wheelfr = new ModelRenderer(this);
-        this.wheelfr.setRotationPoint(16F, 18F, -30.0F);
-        this.wheelfr.setTextureOffset(161+64, 44+32).addBox(-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F, 0.0F, 0.0F, 0.0F);
-        this.wheelrr = new ModelRenderer(this);
-        this.wheelrr.setRotationPoint(16F, 18F, 28.0F);
-        this.wheelrr.setTextureOffset(161+64, 44+32).addBox(-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F, 0.0F, 0.0F, 0.0F);
-        this.wheelfl = new ModelRenderer(this);
-        this.wheelfl.setRotationPoint(-17.5F, 18.0F, -30.0F);
-        this.wheelfl.setTextureOffset(161+64, 44+32).addBox(-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F, 0.0F, 0.0F, 0.0F);
-        this.wheelrl = new ModelRenderer(this);
-        this.wheelrl.setRotationPoint(-17.5F, 18.0F, 28.0F);
-        this.wheelrl.setTextureOffset(161+64, 44+32).addBox(-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F, 0.0F, 0.0F, 0.0F);
-        
-        //This allows the creation of a bunch of seats in an array and then render them all at once.
-        //Better than instantiating 20 variables and then listing them in the renderer.
-        //This code was written in preparation for making a bus renderer class in less code.
-        //This will use an array filling function that automatically generates the seat positions in a future bus renderer code.
-        Vector3d[] seatpositions = new Vector3d[]{
-        		new Vector3d(6.25F,-1.5F,-10F), new Vector3d(-6.25F,-1.5F,-10F),
-        		new Vector3d(6.25F,-1.5F,10F), new Vector3d(-6.25F,-1.5F,10F)
-        };
-        
-        
-        this.seats = new ModelRenderer(this);
-        this.seats.setRotationPoint(0, 0, 0);
-        this.seats = makeSeats(this.seats,this.seatTextureLocation,seatpositions);//create the seats using the seatpositions array and put them under the ModelRenderer.
-        
-        //parenting blocks
-        this.Chassis.addChild(WindowBack);
-        this.Chassis.addChild(WindshieldModel);
-        this.Chassis.addChild(doorfl);
-        this.Chassis.addChild(doorfr);
-        this.Chassis.addChild(doorrl);
-        this.Chassis.addChild(doorrr);
-        this.Chassis.addChild(Lid);
-        this.Chassis.addChild(seats);
-        //this.Chassis.addChild(seats);
-        
-        
-        
+@OnlyIn(Dist.CLIENT)
+public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
+	
+	
+	//stores all model variants
+	//public HashMap<Integer,GeneralPartModel> AllModelPartModels = new HashMap<Integer,GeneralPartModel>();
+	
+	
+	
+    public FollowingCarModel(ModelPart bakeLayer) {
+    	
+		//add all models and add them to the bake layer at the same time
+		
+    	
+    	
+    	//this is where a new model variant is added.
+		//AllModelPartModels.put(0, new DefaultModel(bakeLayer));
+		
+		//this model now has a .obj!
+		//AllModelPartModels.put(1, new AE86Model(bakeLayer));
     }
-
-    @Override
-    public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) { 
-        ImmutableList.of(this.Chassis, this.wheelfl,this.wheelfr,this.wheelrl,this.wheelrr).forEach((modelRenderer) -> { 
-            modelRenderer.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-        });
+	public static LayerDefinition createBodyMesh(CubeDeformation p_170769_) {
+    	
+    	
+    	MeshDefinition meshdefinition = new MeshDefinition();
+        //PartDefinition modelroot = meshdefinition.getRoot();
         
-    }
+        
+        //AE86Model.addModelLayer(modelroot, p_170769_);
+    	
+        return LayerDefinition.create(meshdefinition, 256, 256);
+    }/*
 
 
     /**
      * This is a helper function from Tabula to set the rotation of model parts
-     */
-    public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-        modelRenderer.rotateAngleX = x;
-        modelRenderer.rotateAngleY = y;
-        modelRenderer.rotateAngleZ = z;
+     
+	public void setRotateAngle(ModelPart ModelPart, float x, float y, float z) {
+        ModelPart.xRot = x;
+        ModelPart.yRot = y;
+        ModelPart.zRot = z;
     }
     
-    //if you want to expand the library of cars, use this function to add seats to the car. it just makes things easier.
-    //look at the seats ModelRenderer for usage.
-    //the seats are centered on the point that is inputed
     
-    public ModelRenderer makeSeats(ModelRenderer seat,int[] offset, Vector3d[] Positions) {
+    
+    @Override
+    public void prepareMobModel(T p_102614_, float p_102615_, float p_102616_, float p_102617_) {
+    	super.prepareMobModel(p_102614_, p_102615_, p_102616_, p_102617_);
     	
-    	//this takes every seat position in the array, extracts it, and then adds it as an offset
-    	//to the ModelRenderer location. Then it returns the modelRenderer so all the seats render at the same time.
-    	for(Vector3d Position : Positions) {
-	    	seat.setTextureOffset(offset[0], offset[1]).addBox(((float)Position.x-6), ((float)Position.z-6), 12, 1.5F, 12, 0);
-	    	seat.setTextureOffset(offset[0], offset[1]+15).addBox(((float)Position.x-6), ((float)Position.y-15), ((float)Position.z+6), 12, 15, 1.5F, 0);
-    	}
-    	return seat;
+    	//AllModelPartModels.forEach((k,Model) ->{( Model).setDefaultRotations();});
+    	
     }
     
-
-	@Override
-	public void setRotationAngles(FollowingCar entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
-			float netHeadYaw, float headPitch) {
-		this.setRotateAngle(wheelfl, limbSwing/1.1F, 0.0f, 0.0f);
-		this.setRotateAngle(wheelfr, limbSwing/1.1F, 0.0f, 0.0f);
-		this.setRotateAngle(wheelrr, limbSwing/1.1F, 0.0f, 0.0f);
-		this.setRotateAngle(wheelrl, limbSwing/1.1F, 0.0f, 0.0f);
-		this.setRotateAngle(Chassis, 0F, 0F, 0F);
-		if(entityIn.isEntitySleeping()) {
-			//rotate wheels if sitting
-			this.setRotateAngle(wheelfl, limbSwing/1.1F, 0.0f, 0.6f);
-			this.setRotateAngle(wheelfr, limbSwing/1.1F, 0.0f, -0.6f);
-			this.setRotateAngle(wheelrr, limbSwing/1.1F, 0.0f, -0.6f);
-			this.setRotateAngle(wheelrl, limbSwing/1.1F, 0.0f, 0.6f);
-			//rotate body if sitting
-			this.setRotateAngle(Chassis, -.05F, 0F, 0F);
+    /*
+    private void PrepModel(T entityIn, float limbSwing) {
+    	
+    	//hide all models and their parts, then unhide what model the car is set to.
+		AllModelPartModels.forEach((k,Model)-> {Model.forEach((j,Part) -> {Part.visible = false;});});
+		
+		//if it has an easter egg name, render that model. Else use the car model type it is set to.
+		String name = ChatFormatting.stripFormatting(entityIn.getName().getString());
+		
+		if(AllModelPartModels.get(entityIn.getCarType()) == null && FollowingCarRender.NameToVariant.get(name) == null && CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null){
+			AllModelPartModels.get(0).forEach((k,Part) -> {Part.visible = true;});
+		}
+		else if(FollowingCarRender.NameToVariant.get(name) != null){
+			if(CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) != null) {
+				//we don't run anything here, since the model layer will take care of this!
+				//this check is to prevent a block model being drawn if a .obj exists when it has a registered variant name.
+			}
+			else if(AllModelPartModels.get(FollowingCarRender.NameToVariant.get(name)) != null) {
+				AllModelPartModels.get(FollowingCarRender.NameToVariant.get(name)).forEach((k,Part) -> {Part.visible = true;});
+			}
+		}
+		else if (CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null && CarBlockTypesMaster.CarObjModels.get(FollowingCarRender.NameToVariant.get(name)) == null){
+			AllModelPartModels.get(entityIn.getCarType()).forEach((k,Part) -> {Part.visible = true;});
 		}
 		
-		//rotate doors to current door angle on entity
-		this.setRotateAngle(doorfr, 0, (float)(entityIn.GetOpenDoorTime()[0]*(Math.PI/180)),0);
-		this.setRotateAngle(doorfl, 0, (float)(-entityIn.GetOpenDoorTime()[1]*(Math.PI/180)),0);
-		this.setRotateAngle(doorrr, 0, (float)(entityIn.GetOpenDoorTime()[2]*(Math.PI/180)),0);
-		this.setRotateAngle(doorrl, 0, (float)(-entityIn.GetOpenDoorTime()[3]*(Math.PI/180)),0);
 		
 		
-		//angle reference sheet, doesn't do anything really
-		//float rotationaxis = 0.0F;
+		//Below this line is rotations. Above this line is car type parameters 
 		
-		//this.setRotateAngle(doorfl, 0.0F, rotationaxis, 0.0F);
-		//this.setRotateAngle(doorrl, 0.0F, rotationaxis, 0.0F);
-		//this.setRotateAngle(doorfr, 0.0F, rotationaxis, 0.0F);
-		//this.setRotateAngle(doorrr, 0.0F, rotationaxis, 0.0F);
-
-		//this.setRotateAngle(Lid, rotationaxis, 0.0F, 0.0F);
+		
+		//set wheel rotations for all models and all wheels
+		if(entityIn.isOrderedToSit() || entityIn.isInSittingPose()) {
+	    	AllModelPartModels.forEach((k,Model)-> {
+	    		boolean foundwheel = true;
+	    		int i = 0;
+	    		
+	    		//rotate left and right wheels for all car types
+	    		while (foundwheel) {
+	    			i++;
+	    			if(Model.get("wheel-l"+i) != null){
+	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, 0.0f, 0.6f);
+	    			}
+	    			else {
+	    				foundwheel = false;
+	    			}
+	    		}
+	    		foundwheel = true;
+	    		i = 0;
+	    		while (foundwheel) {
+	    			i++;
+	    			if(Model.get("wheel-r"+i) != null){
+	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, 0.0f, -0.6f);
+	    			}
+	    			else {
+	    				foundwheel = false;
+	    			}
+	    		}
+	    		this.setRotateAngle(Model.get("Chassis"),-.05F, 0F, 0F);
+	    	});
+    	}
+    	else {
+	    	AllModelPartModels.forEach((k,Model)-> {
+	    		boolean foundwheel = true;
+	    		int i = 0;
+	    		
+	    		//rotate left and right wheels for all car types
+	    		while (foundwheel) {
+	    			i++;
+	    			if(Model.get("wheel-l"+i) != null){
+	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, 0.0f, 0.0f);
+	    			}
+	    			else {
+	    				foundwheel = false;
+	    			}
+	    		}
+	    		i = 0;
+	    		foundwheel = true;
+	    		while (foundwheel) {
+	    			i++;
+	    			
+	    			if(Model.get("wheel-r"+i) != null){
+	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, 0.0f, 0.0f);
+	    			}
+	    			else {
+	    				foundwheel = false;
+	    			}
+	    		}
+	    		this.setRotateAngle(Model.get("Chassis"),0F, 0F, 0F);
+	    	});
+	    	
+    	}
+		AllModelPartModels.forEach((k,Model) ->{(Model).doorRotations(entityIn,limbSwing);});
+	}
+	//setup animation really means animation event...
+    //we'll use this to change model parts that need rotations dependent on the type of model.
+	@Override
+	public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+			float netHeadYaw, float headPitch) {
+		
+		
+		PrepModel(entityIn, limbSwing);
+	}
+	
+	@Override
+	public void renderToBuffer(PoseStack p_103111_, VertexConsumer p_103112_, int p_103113_, int p_103114_,
+			float p_103115_, float p_103116_, float p_103117_, float p_103118_) {
+		
+		
+		
+		/*
+		AllModelPartModels.forEach((k,Model) ->{Model.renderToBuffer( p_103111_, p_103112_, p_103113_, p_103114_, p_103115_, p_103116_, p_103117_, p_103118_);
+        });
+	}*/
+	@Override
+	public void setupAnim(T p_102618_, float p_102619_, float p_102620_, float p_102621_, float p_102622_,
+			float p_102623_) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void renderToBuffer(PoseStack p_103111_, VertexConsumer p_103112_, int p_103113_, int p_103114_,
+			float p_103115_, float p_103116_, float p_103117_, float p_103118_) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -4,550 +4,581 @@ package followingcar.common.entities;
 
 
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.SitGoal;
+
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
+import net.minecraft.world.entity.ai.goal.TemptGoal;
 import followingcar.common.items.itemsmaster;
 import followingcar.config.FollowingCarConfig;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.IRideable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.FlyingPathNavigator;
-import net.minecraft.pathfinding.GroundPathNavigator;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.pathfinding.WalkNodeProcessor;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.PlayerRideable;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.item.DyeItem;
 
-public class FollowingCar extends TameableEntity implements IRideable{
-	private static final Ingredient TAMING_ITEMS = Ingredient.fromItems(itemsmaster.GASCAN);
-	private static final DataParameter<Integer> COLOR = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT);
-	private static final DataParameter<Integer> TYPE = EntityDataManager.createKey(FollowingCar.class, DataSerializers.VARINT); //<-- this is prep for adding more car models in the future
-	private int[] openDoorTime = {
-			0,0,
-			0,0
+public class FollowingCar extends TamableAnimal implements PlayerRideable{
+	private static final Ingredient TAMING_ITEMS = Ingredient.of(itemsmaster.GASCAN);
+	private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(FollowingCar.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> TYPE = SynchedEntityData.defineId(FollowingCar.class, EntityDataSerializers.INT); //<-- this is prep for adding more car models in the future
+	private List<Integer> openDoorTime = new ArrayList<Integer>() {
+		private static final long serialVersionUID = 432987030978417908L;
+
+		{
+			add(0,0);
+			add(1,0);
+			add(2,0);
+			add(3,0);
+			add(4,0);
+			add(5,0);
+			add(6,0);
+			add(7,0);
+			add(8,0);
+			add(9,0);
+		}
 	};
 	
-	//private final int seats = 4; //how many seats the car has. Can be changed in a new kind of vehicle that has 6 or even 100 seats.
 	
-	public int[] GetOpenDoorTime() {
+	
+
+	
+	public List<Integer> GetOpenDoorTime() {
 		return this.openDoorTime;
 	}
-	
-	
-	
-	
-	
+
 	//taming the car / claiming it as your own / riding car
 	@Override
-	public ActionResultType func_230254_b_(PlayerEntity actor, Hand playerhand) {
-		 ItemStack itemstack = actor.getHeldItem(playerhand);
-	      Item item = itemstack.getItem();
-         if (this.isTamed()) {
-            if (this.isOwner(actor)) {
-                  if (itemstack.getItem() == itemsmaster.GASCAN && this.getHealth() < this.getMaxHealth()) {
-                     this.consumeItemFromStack(actor, itemstack);
-                     this.heal((float)5);
-                     if(this.getHealth() < this.getMaxHealth()) {
-                    	 this.setHealth(this.getMaxHealth());
-                     }
-                     return ActionResultType.CONSUME;
-                  }
-                  try {
-	                  DyeColor dyecolor = ((DyeItem)item).getDyeColor();
-	                  if (dyecolor != this.getColor()) {
-	               	   this.setColor(dyecolor);
-	                     if (!actor.abilities.isCreativeMode) {
-	                   	  this.consumeItemFromStack(actor, itemstack);
-	                     }
-	                  
-	                     this.enablePersistence();
-	                     return ActionResultType.CONSUME;
-	                  }
-                  }
-                  catch(Exception e) {
-                	  
-                  }
-                  
-                  
-               }
-            
-            if(!actor.isSneaking()){//if the person who right clicked it is not sneaking
-            	if(this.isSitting()) { //and the car is sitting
-            		if(this.isOwner(actor)) { //and the person who right clicked it is the owner of the car
-            			this.func_233687_w_(false); //then make it stand up and put the owner in the car
-            			openDoor(this.getPassengers().size()+1);
-                    	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
-            		}
-            	}
-            	else { //if it is not sitting, allow someone in no matter the person.
-            		openDoor(this.getPassengers().size()+1);
-                	return actor.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
-            	}
-            }
-            else { //if they are sneaking, aka trying to get it to stand
-            	if(this.isOwner(actor)) { //only make the car stand if it is the owner.
-            		this.func_233687_w_(!this.isSitting());
-            	}
-            }
-            return ActionResultType.func_233537_a_(this.world.isRemote);
-	             
-         } else if (itemstack.getItem() == itemsmaster.GASCAN) {
-	            this.consumeItemFromStack(actor, itemstack);
-	            if (this.rand.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, actor)) {
-	               this.setTamedBy(actor);
-	            } 
-	            else {
-	            }
+	public InteractionResult mobInteract(Player actor, InteractionHand playerhand) {
+		ItemStack itemstack = actor.getItemInHand(playerhand);
+		Item item = itemstack.getItem();
+		if (this.isTame()) {
+			if (this.isOwnedBy(actor)) {
+				if (itemstack.getItem() == itemsmaster.GASCAN && this.getHealth() < this.getMaxHealth()) {
+					this.consumeItemFromStack(actor, itemstack);
+					this.heal((float)5);
+					if(this.getHealth() < this.getMaxHealth()) {
+						this.setHealth(this.getMaxHealth());
+					}
+					return InteractionResult.CONSUME;
+				}
+				try {
+					DyeColor dyecolor = ((DyeItem)item).getDyeColor();
+					if (dyecolor != this.getColor()) {
+						this.setColor(dyecolor);
+						if (!actor.isCreative()) {
+							this.consumeItemFromStack(actor, itemstack);
+						}
 
-	            this.enablePersistence();
-	            return ActionResultType.CONSUME;
-	         }
-             
-             return ActionResultType.func_233537_a_(this.world.isRemote);
-          }
+						this.setPersistenceRequired();
+						return InteractionResult.CONSUME;
+					}
+				}
+				catch(Exception e) {
+
+				}
+
+
+			}
+
+			if(!actor.isCrouching()){//if the person who right clicked it is not sneaking
+				if(this.isInSittingPose() || this.isOrderedToSit() ) { //and the car is sitting
+					if(this.isOwnedBy(actor)) { //and the person who right clicked it is the owner of the car
+						this.setOrderedToSit(false); //then make it stand up and put the owner in the car
+						this.setInSittingPose(false);
+
+						//change this for bus if it has only one door or something
+						openDoor(this.getPassengers().size()+1);
+						return actor.startRiding(this) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+					}
+				}
+				else { //if it is not sitting, allow someone in no matter the person.
+
+					openDoor(this.getPassengers().size()+1);
+					return actor.startRiding(this) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+				}
+			}
+			else { //if they are sneaking, aka trying to get it to stand
+				if(this.isOwnedBy(actor)) { //only make the car stand if it is the owner.
+					this.setOrderedToSit(!this.isOrderedToSit());
+					return InteractionResult.SUCCESS;
+				}
+			}
+			return InteractionResult.PASS;
+
+		} else if (itemstack.getItem() == itemsmaster.GASCAN) {
+			this.consumeItemFromStack(actor, itemstack);
+			if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, actor)) {
+				this.tame(actor);
+			} 
+			else {
+				return InteractionResult.CONSUME;
+			}
+
+			this.setPersistenceRequired();
+			return InteractionResult.SUCCESS;
+		}
+
+		return InteractionResult.PASS;
+	}
+
+	private void consumeItemFromStack(Player actor, ItemStack itemstack) {
+		itemstack.setCount(this.clamp(itemstack.getCount()-1,0,itemstack.getMaxStackSize()));
+	}
+
+	private int clamp(int x,int min,int max) {
+		return Math.min(Math.max(x,min), max);
+	}
+
+
 
 	@Override
-	public boolean canFitPassenger(Entity passenger) {
-	      return this.getPassengers().size() < 4 && !this.areEyesInFluid(FluidTags.WATER);
-	   }
-	
+	public boolean canAddPassenger(net.minecraft.world.entity.Entity passenger) {
+		int maxpassengers = 1;
+		if(this.getCarType() == 0){
+			maxpassengers = 4;
+		}
+		else if(this.getCarType() == 2){
+			maxpassengers = 2;
+		}
+
+
+		return this.getPassengers().size() < maxpassengers && !this.isEyeInFluid(FluidTags.WATER);
+	}
+
 	private void openDoor(int size) {
-		// TODO Auto-generated method stub
-		this.openDoorTime[size-1] = 80;
+		this.openDoorTime.set(size-1, 80);
 	}
 
 
 	public void setColor(DyeColor color) {
-	      this.dataManager.set(COLOR, color.getId());
-	   }
+		this.entityData.set(COLOR, color.getId());
+	}
+	
+	@Override
+	public void tick() {
+		super.tick();
+		
+		for( int i = 0; i<this.openDoorTime.size();i++) {
+			int door = this.openDoorTime.get(i);
+			
+			if(Math.abs(door) > 5) {
+				this.openDoorTime.set(i, door-(5*(Math.abs(door)/door)));
+			}
+			else {
+				this.openDoorTime.set(i, 0);
+			}
+		}
+		
+	}
 		
 	
 	//controlling car block
 	
 	
-	//fixing passenger position:
-	protected void applyYawToEntity(Entity entityToUpdate) {
-	      entityToUpdate.setRenderYawOffset(this.rotationYaw);
-	      float f = MathHelper.wrapDegrees(entityToUpdate.rotationYaw - this.rotationYaw);
-	      float f1 = MathHelper.clamp(f, -105.0F, 105.0F);
-	      entityToUpdate.prevRotationYaw += f1 - f;
-	      entityToUpdate.rotationYaw += f1 - f;
-	      entityToUpdate.setRotationYawHead(entityToUpdate.rotationYaw);
-	   }
-	@Override
-	 public void updatePassenger(Entity passenger) {
-		super.updatePassenger(passenger);
-		      if (this.isPassenger(passenger)) {
-		    	  
-		    	  //takes passengers in rows of 2, infinitely backward. This can easily be modified for a bus with more on each row.
-		    	   //
-		    	  
-		    	  int i = this.getPassengers().indexOf(passenger); //get where the passenger is
-		    	  
-		    	  int count = this.getPassengers().size(); //get how many passengers there are
-		    	  
-		    	  i = Math.abs(i-(count-1)); //reverse it so the first passenger would be in the last available instead
-		    	  
-		         float y = ((((int)(i/2)))*-1.1F)  + .5F;
-		         float x = (float) ((Math.floorMod(i, 2)-.5));
+	private float deltarotation = 0;
 
-		         Vector3d vector3d = (new Vector3d((double)y, 0D, x)).rotateYaw(-this.renderYawOffset * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
-		         passenger.setPosition(this.getPosX() + vector3d.x, this.getPosY()-.2, this.getPosZ() + vector3d.z);
-		      }
-	   }
-	
+
+	@Override
+	public void onPassengerTurned(Entity passenger) {
+		updatePassengerPos(passenger);
+	}
+	@Override
+	public void positionRider(Entity passenger) {
+		updatePassengerPos(passenger);
+	}
+
+	public void updatePassengerPos(Entity passenger) {
+		//super.positionRider(passenger);
+		if (this.hasPassenger(passenger)) {
+
+			//takes passengers in rows of 2, infinitely backward. This can easily be modified for a bus with more on each row.	    	  
+
+			int i = this.getPassengers().indexOf(passenger); //get where the passenger is
+
+			int count = this.getPassengers().size(); //get how many passengers there are 
+			i = Math.abs(i-(count-1)); //reverse it so the first passenger would be in the last available instead
+			float y = ((((int)(i/2)))*-1.1F)  + .5F;
+			float x = (float) ((Math.floorMod(i, 2)-.5));
+			if(this.getCarType() == 2) {
+				y-=4/16; //divide by 16 because model is by 16ths of a block.
+			}
+			if(this.getCarType() == 0) {
+				y-=.7;
+			}
+
+			Vec3 vector3d = (new Vec3((double)y, 0.0D, (double)x)).yRot(-(this.getYRot()) * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
+			
+			passenger.setPos(this.getX()+vector3d.x,this.getY()+.02F,this.getZ()+vector3d.z);
+			
+			passenger.setYBodyRot(this.getYRot());
+		      float f = Mth.wrapDegrees(passenger.getYRot() - this.getYRot());
+		      float f1 = Mth.clamp(f, -360F, 360F)+this.deltarotation;
+		      passenger.yRotO += f1 - f;
+		      passenger.setYRot(passenger.getYRot() + f1 - f);
+		      passenger.setYHeadRot(passenger.getYRot());
+			
+			//LOGGER.info("hello!");
+		}
+	}
+
+
+
 	//opening door animation timer
-	
-	
-	
-	
-	
+
+
+
+
+	float lastcntrlx = 0.0F;
 	//moving car with player
 	@Override
-	public void travel(Vector3d travelVector) {
-		
-		if (this.isBeingRidden()) {
-			for(int i=0;i<(this.openDoorTime.length-1);i++) {
-				if(this.openDoorTime[i] > 0) {
-					this.openDoorTime[i] -= 4;
-				}
-			}
-			this.stepHeight = 1F;
+	public void travel(Vec3 travelVector) {
+
+		if (this.getPassengers().size() > 0) {
+			this.maxUpStep = 1.1F;
 			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(this.getPassengers().size()-1);//make the last passenger the controlling one, but since the display of the passenger...
 			//positions is shifted, the person that is visually the first is the one controlling.
-			Vector3d motion = new Vector3d(0,0,0);
-	    	float f = livingentity.moveForward;
-	    	
-	    	//this code makes the car speed up and slow down if old movement is disabled. Else, use old movement.
-	    	float speed = this.getAIMoveSpeed();
-	    	if(!FollowingCarConfig.oldmovement.get()) {
-	    		if(f != 0.0F) {
-	    			if(speed < 0.01F) {
-		    			speed = 0.01F;
-		    		}
-	    			if(speed < 1.1 && f>0) {
-	    				speed += 0.02F;
-	    			}else if(speed < .3 && f<0) {
-	    				speed += 0.02F;
-	    			}
-	    			this.setRotation(livingentity.getRotationYawHead(), 0F);
-	    			
-	    		}
-	    		else if(f == 0.0F){
-	    			speed -= .05F;
-	    			if(speed < 0.01F) {
-		    			speed = 0F;
-		    		}
+			Vec3 motion = new Vec3(0,0,0);
+			
+			
+			
+			
+			float cntrlx = livingentity.zza;
+			float cntrly = livingentity.xxa;
+			
+			if(0.8F < Mth.abs(cntrlx)) {
+				lastcntrlx = cntrlx;
+			}
+			
+			//this code makes the car speed up and slow down if old movement is disabled. Else, use old movement.
+			float speed = this.getSpeed();
+			if(!FollowingCarConfig.oldmovement.get()) {
+				if(cntrlx != 0.0F) {
+					//speed = .1F;
+					if((speed > -5 && speed < 10) == false) {
+						speed = .1F;
+					}
+					//LOGGER.info(speed);
+					
+					speed += (((float)(this.clamp(((int)(Math.log(speed+1)*100)), -5, 100))/1000));//*(Math.abs(speed+1)/(speed+1));
+					
+					speed = ((float)this.clamp(((int)(speed*1000)),0,400))/1000;
+					
+					
+				}
+				else{
+					speed -= (((float)(this.clamp(((int)(Math.log(speed+1)*100)), -5, 100))/1000));
+					if(Math.abs(speed) < 0.11F) {
+						speed = 0.11F;
+					}
+				}
+				
+				//LOGGER.info(cntrly);
+				
+				this.deltarotation = 0;
+				float rotationspeed = ((float)this.clamp(((int)((speed-0.1F)*1000)), 0, 4000))/3900;
+				
+				if(cntrly != 0.0F) {
+					float newrot = ((((-3.9F*((rotationspeed-0.5F)*(rotationspeed-0.5F))))+1)* /*Max turn angle speed:*/15)*(-cntrly*(Math.abs(lastcntrlx)/lastcntrlx));
+					
+					this.setYRot(this.getYRot()+newrot);
+					this.deltarotation = newrot/3.1F;
+				}
+				
+				//f *= (Math.abs(speed)/speed);
+				//LOGGER.info(f);
+				motion = new Vec3(0,0,cntrlx);
+				//this.setYRot(livingentity.getYRot());
+				this.setSpeed(speed);
 
-			        f=0.98F;
-	    		}
-	    		
-	    		motion = new Vector3d(0,0,f);
-				
-				this.setAIMoveSpeed(Math.abs(speed));
-				
-	    	}
-	    	else {//else use simple old movement
-	    		motion = new Vector3d(0,0,f);
-				
-				this.setAIMoveSpeed(Math.abs(f));
-				
-	    	}
-	    	
-	    	super.travel(motion);
-			
-			
+			}
+			else {//else use simple old movement
+				motion = new Vec3(0,0,cntrlx);
+
+				this.setSpeed(Math.abs(cntrlx));
+				this.setYRot(this.getYRot()+(cntrly*5));
+			}
+
+			super.travel(motion);
+
+
 		}
 		else {
 			super.travel(travelVector);
 		}
-		
-	}
-	@Override
-	public boolean onLivingFall(float distance, float damageMultiplier) {
-      if (distance > 3F) {
-         //this.playSound(SoundEvents.ENTITY_HORSE_LAND, 0.4F, 1.0F); don't have a suspension crack or clang effect... or I'm just lazy..
-      }
-      int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
-      if (i <= 0) {
-         return false;
-      } else {
-         this.attackEntityFrom(DamageSource.FALL, (float)i);
-         if (this.isBeingRidden()) {
-            for(Entity entity : this.getRecursivePassengers()) {
-               entity.attackEntityFrom(DamageSource.FALL, (float)i);
-            }
-         }
 
-         this.playFallSound();
-         return true;
-      }
-   }
-     
-	     
-	
-	//end controlling car block
-		
-	//have to have some way of getting rid of a protected! ;)
+	}
+
 	@Override
-	 public void onKillCommand() {
-	      this.remove();
-	 }
-	
-	
-	public FollowingCar(EntityType<? extends TameableEntity> type, World worldIn) {
+	public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource p_147189_) {
+		float[] ret = net.minecraftforge.common.ForgeHooks.onLivingFall(this, distance, damageMultiplier);
+		if (ret == null) return false;
+		distance = ret[0];
+		damageMultiplier = ret[1];
+
+		boolean flag = super.causeFallDamage(distance-5, damageMultiplier*10, p_147189_);
+		int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
+		if (i > 0) {
+			this.playSound(this.getFallDamageSound(i), 1.0F, 1.0F);
+			this.playBlockFallSound();
+			this.hurt(p_147189_, (float)i);
+			return true;
+		} else {
+			return flag;
+		}
+	}
+
+
+
+	//end controlling car block
+
+	//have to have some way of getting rid of a protected! ;)
+	//2021 Onan Here... What the hell is past me talking about? /\
+	@Override
+	public void kill() {
+		this.remove(RemovalReason.KILLED);
+	}
+
+
+	public FollowingCar(EntityType<? extends TamableAnimal> type, Level worldIn) {
 		super(type, worldIn);
 	}
-	
+
 	public DyeColor getColor() {
-		return DyeColor.byId(this.dataManager.get(COLOR));
+		return DyeColor.byId(this.entityData.get(COLOR));
 	}
+
 	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new TemptGoal(this, 1D, TAMING_ITEMS, true));
-		this.goalSelector.addGoal(1, new FollowOwnerGoal(this, 1D, 10F, 5F, false));
-		this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1D, 1.0000001E-5F));
+		this.goalSelector.addGoal(1, new FollowOwnerGoal(this, 1.0D, 10.0F, 5.0F, false));
+		this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1D, 1.0000001E-5F));
 		//this.goalSelector.addGoal(3, new LookAtGoal(this, PlayerEntity.class, 10.0F));
-		this.goalSelector.addGoal(1, new SitGoal(this));
+		this.goalSelector.addGoal(1, new CarRelaxOnOwnerGoal(this));
+		this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
 	}
-	
+
 	@Override
-	public ILivingEntityData onInitialSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-		this.dataManager.set(COLOR,this.rand.nextInt(10));
-		this.setAIMoveSpeed(1F);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_28134_, DifficultyInstance p_28135_, MobSpawnType p_28136_, @Nullable SpawnGroupData p_28137_, @Nullable CompoundTag p_28138_) {
+		p_28137_ = super.finalizeSpawn(p_28134_, p_28135_, p_28136_, p_28137_, p_28138_);
+		this.entityData.set(COLOR,this.random.nextInt(10));
+		this.entityData.set(TYPE, 0);
+		this.setSpeed(1F);
 		//this.dataManager.set(TYPE, this.rand.nextInt(3)); <-- this is prep for adding more car models in the future
-		return spawnDataIn;
+		// Use above comment if we add more car models than the easter egg
+
+		return p_28137_;
 	}
-	
+
 
 	public int getCarType() {
-	      return this.dataManager.get(TYPE);
+		return this.entityData.get(TYPE);
 	}
 	public void setCarType(int type) {
-	      this.dataManager.set(TYPE, type);
-	}
-	
-   protected void registerData() {
-      super.registerData();
-      this.dataManager.register(TYPE, 1);
-      //this.dataManager.register(DATA_ID_CHEST, false);
-      this.dataManager.register(COLOR, DyeColor.RED.getId());
-   }
-   public void writeAdditional(CompoundNBT compound) {
-	      super.writeAdditional(compound);
-	      //compound.putInt("Type", getCarType());
-	      compound.putByte("Color", (byte)this.getColor().getId());
-   }
-   
-   public void readAdditional(CompoundNBT compound) {
-	      super.readAdditional(compound);
-	      
-	      this.setCarType(compound.getInt("Type"));
-	      if (compound.contains("Color", 99)) {
-	         this.setColor(DyeColor.byId(compound.getInt("Color")));
-	      }
-
-	   }
-	
-	public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-		return MobEntity.func_233666_p_().createMutableAttribute(Attributes.MOVEMENT_SPEED,.5D).createMutableAttribute(Attributes.MAX_HEALTH, 20.0D).createMutableAttribute(Attributes.ATTACK_DAMAGE, 5.0D);
+		this.entityData.set(TYPE, type);
 	}
 
 	@Override
-	public AgeableEntity func_241840_a(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(TYPE, 1);
+		//this.dataManager.register(DATA_ID_CHEST, false);
+		this.entityData.define(COLOR, DyeColor.RED.getId());
+	}
+
+	@Override
+	public void addAdditionalSaveData(CompoundTag p_28156_) {
+		super.addAdditionalSaveData(p_28156_);
+		p_28156_.putInt("Color", (byte)this.getColor().getId());
+		p_28156_.putInt("CarType", getCarType());
+	}
+	@Override
+	public void readAdditionalSaveData(CompoundTag p_28142_) {
+		super.readAdditionalSaveData(p_28142_);
+		this.setCarType(p_28142_.getInt("CarType"));
+		if (p_28142_.contains("Color", 99)) {
+			this.setColor(DyeColor.byId(p_28142_.getInt("Color")));
+		}
+
+	}
+
+	//This is called in the main mod file. in MainFollowingCar.java
+	public static AttributeSupplier setCustomAttributes() {
+		return LivingEntity.createLivingAttributes().add(Attributes.ATTACK_DAMAGE, 5.0D).add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.MOVEMENT_SPEED,.5D).add(Attributes.FOLLOW_RANGE,10D).build();
+	}
+
+
+	static class CarTemptGoal extends net.minecraft.world.entity.ai.goal.TemptGoal {
+		@Nullable
+		private Player selectedPlayer;
+		private final FollowingCar car;
+
+		public CarTemptGoal(FollowingCar p_28219_, double p_28220_, Ingredient p_28221_, boolean p_28222_) {
+			super(p_28219_, p_28220_, p_28221_, p_28222_);
+			this.car = p_28219_;
+		}
+
+		public void tick() {
+			super.tick();
+			if (this.selectedPlayer == null && this.mob.getRandom().nextInt(600) == 0) {
+				this.selectedPlayer = this.player;
+			} else if (this.mob.getRandom().nextInt(500) == 0) {
+				this.selectedPlayer = null;
+			}
+
+		}
+		@Override
+		protected boolean canScare() {
+			return false;
+		}
+		@Override
+		public boolean canUse() {
+			return super.canUse() && !this.car.isTame();
+		}
+	}
+
+
+
+	//car sits on owner in bed. This is like the cat one but without the morning gift and stuff
+	static class CarRelaxOnOwnerGoal extends Goal {
+		private final FollowingCar car;
+		private Player ownerPlayer;
+		private BlockPos goalPos;
+		private int onBedTicks;
+
+		public CarRelaxOnOwnerGoal(FollowingCar p_28203_) {
+			this.car = p_28203_;
+		}
+
+		public boolean canUse() {
+			if (!this.car.isTame()) {
+				return false;
+			} else if (this.car.isOrderedToSit()) {
+				return false;
+			}
+			else if (this.car.getPassengers().size() > 0) {
+				return false;
+			} else {
+				LivingEntity livingentity = this.car.getOwner();
+				if (livingentity instanceof Player) {
+					this.ownerPlayer = (Player)livingentity;
+					if (!livingentity.isSleeping()) {
+						return false;
+					}
+
+					if (this.car.distanceToSqr(this.ownerPlayer) > 100.0D) {
+						return false;
+					}
+
+					BlockPos blockpos = this.ownerPlayer.blockPosition();
+					BlockState blockstate = this.car.level.getBlockState(blockpos);
+					if (blockstate.is(BlockTags.BEDS)) {
+						this.goalPos = blockstate.getOptionalValue(BedBlock.FACING).map((p_28209_) -> {
+							return blockpos.relative(p_28209_.getOpposite());
+						}).orElseGet(() -> {
+							return new BlockPos(blockpos);
+						});
+						return !this.spaceIsOccupied();
+					}
+				}
+
+				return false;
+			}
+		}
+
+		private boolean spaceIsOccupied() {
+			for(FollowingCar car : this.car.level.getEntitiesOfClass(FollowingCar.class, (new AABB(this.goalPos)).inflate(2.0D))) {
+				if (car != this.car && (car.isInSittingPose())) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public boolean canContinueToUse() {
+			return this.car.isTame() && !this.car.isOrderedToSit() && this.ownerPlayer != null && this.ownerPlayer.isSleeping() && this.goalPos != null && !this.spaceIsOccupied();
+		}
+
+		public void start() {
+			if (this.goalPos != null && !(this.car.getPassengers().size() > 0)) {
+				this.car.setInSittingPose(false);
+				this.car.getNavigation().moveTo((double)this.goalPos.getX(), (double)this.goalPos.getY(), (double)this.goalPos.getZ(), (double)1.1F);
+			}
+
+		}
+
+		public void stop() {
+			this.car.setOrderedToSit(false);
+			this.car.setInSittingPose(false);
+
+			this.onBedTicks = 0;
+			this.car.getNavigation().stop();
+		}
+
+
+		public void tick() {
+			super.tick();
+			if (this.ownerPlayer != null && this.goalPos != null) {
+				this.car.setInSittingPose(false);
+				this.car.getNavigation().moveTo((double)this.goalPos.getX(), (double)this.goalPos.getY(), (double)this.goalPos.getZ(), (double)1.1F);
+				if (this.car.distanceToSqr(this.ownerPlayer) < 2.5D) {
+					++this.onBedTicks;
+					if (this.onBedTicks > 16) {
+						this.car.setInSittingPose(true);
+					} else {
+						this.car.lookAt(this.ownerPlayer, 45.0F, 45.0F);
+					}
+				} else {
+					this.car.setInSittingPose(false);
+				}
+			}
+
+		}
+	}
+
+
+
+	@Override
+	public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	static class FollowOwnerGoal extends net.minecraft.entity.ai.goal.FollowOwnerGoal{
-	   private final TameableEntity tameable;
-	   private LivingEntity owner;
-	   private final IWorldReader world;
-	   private final double followSpeed;
-	   private final PathNavigator navigator;
-	   private int timeToRecalcPath;
-	   private final float maxDist;
-	   private final float minDist;
-	   private float oldWaterCost;
-	   private final boolean teleportToLeaves;
-	   
-	   /**
-	    * Returns whether an in-progress EntityAIBase should continue executing
-	    */
-	   public boolean shouldContinueExecuting() {
-	      if (this.navigator.noPath()) {
-	         return false;
-	      } else if (this.tameable.isSitting()) {
-	         return false;
-	      } else {
-	         return !(this.tameable.getDistanceSq(this.owner) <= (double)(this.maxDist * this.maxDist));
-	      }
-	   }
-
-	   /**
-	    * Execute a one shot task or start executing a continuous task
-	    */
-	   public void startExecuting() {
-	      this.timeToRecalcPath = 0;
-	      this.oldWaterCost = this.tameable.getPathPriority(PathNodeType.WATER);
-	      this.tameable.setPathPriority(PathNodeType.WATER, 0.0F);
-	   }
-
-	   /**
-	    * Reset the task's internal state. Called when this task is interrupted by another one
-	    */
-	   public void resetTask() {
-	      this.owner = null;
-	      this.navigator.clearPath();
-	      this.tameable.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
-	   }
-
-	   public FollowOwnerGoal(TameableEntity tameable, double speed, float minDist, float maxDist, boolean teleportToLeaves) {
-		  super(tameable, speed, minDist, maxDist, teleportToLeaves);
-		  this.tameable = tameable;
-	      this.world = tameable.world;
-	      this.followSpeed = speed;
-	      this.navigator = tameable.getNavigator();
-	      this.minDist = minDist;
-	      this.maxDist = maxDist;
-	      this.teleportToLeaves = teleportToLeaves;
-	      this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
-	      if (!(tameable.getNavigator() instanceof GroundPathNavigator) && !(tameable.getNavigator() instanceof FlyingPathNavigator)) {
-	         throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
-	      }
-	   }
-	
-	   
-	   @Override
-	   public boolean shouldExecute() {
-	      LivingEntity livingentity = this.tameable.getOwner();
-	      if (livingentity == null) {
-	         return false;
-	      } else if (livingentity.isSpectator()) {
-	         return false;
-	      } else if (this.tameable.isSitting()) {
-	         return false;
-	      } else if (this.tameable.getDistanceSq(livingentity) < (double)(this.minDist * this.minDist)) {
-	         return false;
-	      } else if (this.tameable.getPassengers().size() > 0) {
-	    	  return false;
-	      }
-	      else {
-	         this.owner = livingentity;
-	         return true;
-	      }
-	   }
-	   @Override
-	   public void tick() {
-	      //this.tameable.getLookController().setLookPositionWithEntity(this.owner, 10.0F, (float)this.tameable.getVerticalFaceSpeed());
-	      if (--this.timeToRecalcPath <= 0) {
-	         this.timeToRecalcPath = 10;
-	         if (!this.tameable.getLeashed() && !this.tameable.isPassenger()) {
-	            if (this.tameable.getDistanceSq(this.owner) >= 144.0D) {
-	               this.tryToTeleportNearEntity();
-	            } else {
-	               this.navigator.tryMoveToEntityLiving(this.owner, this.followSpeed);
-	            }
-
-	         }
-	      }
-	   }
-
-	   private void tryToTeleportNearEntity() {
-	      BlockPos blockpos = this.owner.getPosition();
-
-	      for(int i = 0; i < 10; ++i) {
-	         int j = this.getRandomNumber(-3, 3);
-	         int k = this.getRandomNumber(-1, 1);
-	         int l = this.getRandomNumber(-3, 3);
-	         boolean flag = this.tryToTeleportToLocation(blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
-	         if (flag) {
-	            return;
-	         }
-	      }
-
-	   }
-
-	   private boolean tryToTeleportToLocation(int x, int y, int z) {
-	      if (Math.abs((double)x - this.owner.getPosX()) < 2.0D && Math.abs((double)z - this.owner.getPosZ()) < 2.0D) {
-	         return false;
-	      } else if (!this.isTeleportFriendlyBlock(new BlockPos(x, y, z))) {
-	         return false;
-	      } else {
-	         this.tameable.setLocationAndAngles((double)x + 0.5D, (double)y, (double)z + 0.5D, this.tameable.rotationYaw, this.tameable.rotationPitch);
-	         this.navigator.clearPath();
-	         return true;
-	      }
-	   }
-
-	   private boolean isTeleportFriendlyBlock(BlockPos pos) {
-	      PathNodeType pathnodetype = WalkNodeProcessor.func_237231_a_(this.world, pos.toMutable());
-	      if (pathnodetype != PathNodeType.WALKABLE) {
-	         return false;
-	      } else {
-	         BlockState blockstate = this.world.getBlockState(pos.down());
-	         if (!this.teleportToLeaves && blockstate.getBlock() instanceof LeavesBlock) {
-	            return false;
-	         } else {
-	            BlockPos blockpos = pos.subtract(this.tameable.getPosition());
-	            return this.world.hasNoCollisions(this.tameable, this.tameable.getBoundingBox().offset(blockpos));
-	         }
-	      }
-	   }
-
-	   private int getRandomNumber(int min, int max) {
-	      return this.tameable.getRNG().nextInt(max - min + 1) + min;
-	   }
-	}
-	
-	static class TemptGoal extends net.minecraft.entity.ai.goal.TemptGoal {
-	    @Nullable
-	    private PlayerEntity temptingPlayer;
-	    private final FollowingCar car;
-	      
-	    @Override
-	    public void tick() {
-	        super.tick();
-	        if (this.temptingPlayer == null && this.creature.getRNG().nextInt(600) == 0) {
-	           this.temptingPlayer = this.closestPlayer;
-	        } else if (this.creature.getRNG().nextInt(500) == 0) {
-	           this.temptingPlayer = null;
-	        }
-	    }
-	      
-	    public TemptGoal(FollowingCar carIn, double speedIn, Ingredient temptItemsIn, boolean scaredByPlayerMovementIn) {
-	        super(carIn, speedIn, temptItemsIn, false);
-	        this.car = carIn;
-	    }
-	     
-	    @Override
-	    public boolean shouldExecute() {
-	  	  return super.shouldExecute() && !this.car.isTamed();
-	    }
-	}
-	
-	//make it so that car behaves as if it can fall far distances.
-	@Override
-	public int getMaxFallHeight() {
-	      return 5;
-	   }
-
-
-	@Override
-	public boolean boost() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public void travelTowards(Vector3d travelVec) {
-		super.travel(travelVec);
-	}
-
-
-	@Override
-	public float getMountedSpeed() {
-		// TODO Auto-generated method stub
-		return (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.225F;
-	}
-
-
 }

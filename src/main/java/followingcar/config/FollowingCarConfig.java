@@ -3,6 +3,7 @@ package followingcar.config;
 import java.io.File;
 
 
+
 import followingcar.MainFollowingCar;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
