@@ -346,6 +346,12 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 
 	}
 
+	
+	@Override
+	 public Vec3 getLightProbePosition(float p_20309_) {
+	      return new Vec3(this.getOnPos().getX()+p_20309_,this.getOnPos().getY()+p_20309_,this.getOnPos().getZ()+p_20309_);
+	 }
+	
 	@Override
 	public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource p_147189_) {
 		float[] ret = net.minecraftforge.common.ForgeHooks.onLivingFall(this, distance, damageMultiplier);
@@ -353,8 +359,8 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 		distance = ret[0];
 		damageMultiplier = ret[1];
 
-		boolean flag = super.causeFallDamage(distance-5, damageMultiplier*10, p_147189_);
-		int i = this.calculateFallDamage(distance-5, damageMultiplier*10);
+		boolean flag = super.causeFallDamage(distance-12, damageMultiplier*15, p_147189_);
+		int i = this.calculateFallDamage(distance-12, damageMultiplier*15);
 		if (i > 0) {
 			this.playSound(this.getFallDamageSound(i), 1.0F, 1.0F);
 			this.playBlockFallSound();
@@ -578,7 +584,6 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 
 	@Override
 	public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

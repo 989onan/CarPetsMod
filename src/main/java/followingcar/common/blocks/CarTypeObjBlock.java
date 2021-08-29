@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CarTypeObjBlock extends Block{
 
-	public CarTypeObjBlock(BlockBehaviour.Properties p_49795_) {
-		super(p_49795_);
+	public CarTypeObjBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	

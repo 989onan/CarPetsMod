@@ -13,6 +13,7 @@ import followingcar.client.render.models.entities.followingcar.FollowingCarModel
 import followingcar.common.entities.FollowingCar;
 import followingcar.core.init.CarBlockTypesMaster;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,11 +32,30 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
+
 import java.util.ArrayList;
+
 @OnlyIn(Dist.CLIENT)
 public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCarModel<FollowingCar>>{
 
 	//important! Defines what the offsets and scales are for each model!!
+	
+	public static class modelstore{
+		
+		public BakedModel model;
+		public BlockState state;
+
+		modelstore(BakedModel model, BlockState state){
+			this.model = model;
+			this.state = state;
+		}
+		
+	}
+	
+	public static HashMap<Integer,HashMap<Integer,modelstore>> BakedColorModels = new HashMap<Integer,HashMap<Integer,modelstore>>();
+	public static HashMap<Integer,HashMap<Integer,modelstore>> BakedColorModelsHigh = new HashMap<Integer,HashMap<Integer,modelstore>>();
+	
+	
 	public static HashMap<Integer,HashMap<String,Vec3>> ModelScales = new HashMap<Integer,HashMap<String,Vec3>>(){
 		private static final long serialVersionUID = 5669485508318977301L;
 
@@ -104,21 +124,48 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 		4. make a .obj file inside the resources: models/obj/Name.obj
 		5. edit the .mtl to have map_Kd followingcarmod:blocks/cartypes/Name at the end.
 		6. add a new set of scale numbers in the ModelScales hashmap above. 
+		
+	 	7. repeat steps 2-5 but with "High" on the end of Name.
 	
 	*/
 	public FollowingCarModelLayer(RenderLayerParent<FollowingCar, FollowingCarModel<FollowingCar>> p_117346_, EntityModelSet entityModelSet) {
 		super(p_117346_);
 	}
 	
+	public BakedModel cachequads(BakedModel colorbakedmodel, BlockState colorblockstate) {
+		 List<BakedQuad> quads = colorbakedmodel.getQuads(colorblockstate, null, new Random(), null);
+	       
+   	 
+		 //give the quads tint
+	     List<BakedQuad> tintedquads = new ArrayList<BakedQuad>(quads.size());
+	     for (BakedQuad item : quads) tintedquads.add(new BakedQuad(item.getVertices(),
+	    		1,
+		 item.getDirection(),
+		 item.getSprite(),
+		 true));
+	   	 
+		    
+		 colorbakedmodel.getQuads(colorblockstate, null, new Random(), null).clear();
+		 colorbakedmodel.getQuads(colorblockstate, null, new Random(), null).addAll(tintedquads);
+		 return colorbakedmodel;
+	}
+	
+	public static int prevtick = 0;
+	
+	public static int curtick = 0;
+	
+	
+	
+	@SuppressWarnings("resource")
 	@Override
 	public void render(PoseStack p_117349_, MultiBufferSource p_117350_, int p_117351_, FollowingCar entityIn,
 			float LimbSwing, float p_117354_, float p_117355_, float p_117356_, float p_117357_, float p_117358_) {
 		Minecraft minecraft = Minecraft.getInstance(); 
 		boolean flag = true;
-         if (!entityIn.isInvisible() || flag) {
+		curtick++;
+         if ((!entityIn.isInvisible() || flag) && (curtick) > prevtick) {
+        	 prevtick = curtick;
         	 BlockRenderDispatcher blockrenderdispatcher = minecraft.getBlockRenderer();
-        	 HashMap<Integer,Block> model; //we get a block from a list of blocks we will render the car as
-        	 
         	 
         	 int type = 0;
         	 
@@ -134,23 +181,77 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
         		 type = entityIn.getCarType();
         	 }
         	 
-        	 model = CarBlockTypesMaster.CarObjModels.get(type);
+        	 HashMap<Integer,Block> model;
+        	 HashMap<Integer,HashMap<Integer,modelstore>> current;
         	 
-        	 if(model != null ){
-        		 Block bodymodel = model.get(0);
-        		 Block wheelmodel = model.get(1);
-        		 Block colormodel = model.get(2);
-        		 HashMap<String,Vec3> scalelist = ModelScales.get(type);
+        	 if(Minecraft.getInstance().options.graphicsMode == GraphicsStatus.FANCY || Minecraft.getInstance().options.graphicsMode == GraphicsStatus.FAST) {
+        		 model = CarBlockTypesMaster.CarObjModels.get(type);
+        		 current = BakedColorModels;
+        	 }
+        	 else {
+        		 model = CarBlockTypesMaster.CarObjModelsHigh.get(type);
+        		 current = BakedColorModelsHigh;
+        	 }
+        	 
+        	 
+        	 
+        	 
+    		 Vec3 scale = new Vec3(1.5,1.5,1.5);
+    		 HashMap<String,Vec3> scalelist = ModelScales.get(type);
+    		 
+    		 if(current.get(type) == null){ //we chache on the first frame, so for the first frame it's not rendered
+    			 if(model != null) {
+    				 current.put(type, new HashMap<Integer,modelstore>());
+            		 HashMap<Integer,modelstore> bakedmodel = current.get(type);
+            		 
+            		 
+            		 BlockState bodyblockstate = model.get(0).defaultBlockState();
+        			 
+		             
+		             BakedModel bodybakedmodel = blockrenderdispatcher.getBlockModel(bodyblockstate);
+		             
+		             BlockState colorblockstate = model.get(2).defaultBlockState();
+		             BakedModel colorbakedmodel = blockrenderdispatcher.getBlockModel(colorblockstate);
+    				 
+    				 
+    				 bakedmodel.put(0, new modelstore(bodybakedmodel,bodyblockstate));
+    				 
+    				 BlockState wheelblockstate = model.get(1).defaultBlockState();
+    				 BakedModel wheelbakedmodel = blockrenderdispatcher.getBlockModel(wheelblockstate);
+    				 bakedmodel.put(1, new modelstore(wheelbakedmodel,wheelblockstate));
+    				 
+    				 colorbakedmodel = cachequads(colorbakedmodel, colorblockstate);
+    				 bakedmodel.put(2,new modelstore(colorbakedmodel,colorblockstate));
+    				 
+            		 
+            		 
+    			 }
+        	 }
+    		 else {//after the first frame it should be chached, so grab the chache and render.
+    			 
+	    		 modelstore body = current.get(type).get(0);
+	    		 modelstore wheel = current.get(type).get(1);
+	    		 modelstore color = current.get(type).get(2);
+	    		 
+	    		 BakedModel bodybakedmodel = body.model;
+	    		 BakedModel wheelbakedmodel = wheel.model;
+	    		 BakedModel colorbakedmodel = color.model;
+	    		 
+	    		 BlockState bodyblockstate = body.state;
+	    		 BlockState wheelblockstate = wheel.state;
+	    		 BlockState colorblockstate = color.state;
+	    		 
         		 
-        		 
-        		 int coords = LivingEntityRenderer.getOverlayCoords(entityIn, 0.0F);
+        		 int coords = LivingEntityRenderer.getOverlayCoords(entityIn, .1F);
         		 //coords = p_117350_.getBuffer(RenderType.outline(InventoryMenu.BLOCK_ATLAS)).applyBakedLighting(coords, null);
         		 
         		 
-        		 if(bodymodel != null && wheelmodel != null && scalelist != null && colormodel != null) {
+        		 if(bodybakedmodel != null && wheelbakedmodel != null && scalelist != null && colorbakedmodel != null) {
         			 float[] afloat = entityIn.getColor().getTextureDiffuseColors();
         			 
         			 
+        			 
+            		    
         			 
         			 //color layer
         			 
@@ -159,13 +260,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
         			 
         			 
         			 
-        			 BlockState bodyblockstate = bodymodel.defaultBlockState();
-        			 Vec3 scale = new Vec3(1.5,1.5,1.5);
-		             
-		             BakedModel bodybakedmodel = blockrenderdispatcher.getBlockModel(bodyblockstate);
-		             
-		             BlockState colorblockstate = colormodel.defaultBlockState();
-		             BakedModel colorbakedmodel = blockrenderdispatcher.getBlockModel(colorblockstate);
+        			 
 		             
 		             Vec3 offset = new Vec3(0F,1.5,0F);
 		             //try to render the car chassis model with given offsets.
@@ -195,21 +290,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 		            	 
 		            	 //color
 		            	 
-		            	 List<BakedQuad> quads = colorbakedmodel.getQuads(colorblockstate, null, new Random(), null);
-		       
 		            	 
-		            	 //give the quads tint
-            		     List<BakedQuad> tintedquads = new ArrayList<BakedQuad>(quads.size());
-            		     for (BakedQuad item : quads) tintedquads.add(new BakedQuad(item.getVertices(),
-            		    		1,
-	            		 item.getDirection(),
-	            		 item.getSprite(),
-	            		 true));
-			            	 
-	            		    
-	            		 colorbakedmodel.getQuads(colorblockstate, null, new Random(), null).clear();
-	            		 colorbakedmodel.getQuads(colorblockstate, null, new Random(), null).addAll(tintedquads);
-	            		    
 	            		    
 	            		 FollowingCarModelLayer.renderBlockOnEntity(p_117349_, p_117350_, p_117351_, flag, blockrenderdispatcher, colorblockstate, coords, colorbakedmodel, new Vec3(afloat[0],afloat[1],afloat[2]),false);
 	            		 p_117349_.popPose();
@@ -221,8 +302,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 		             }
 		             
 		             
-		             BlockState wheelblockstate = wheelmodel.defaultBlockState();
-		            BakedModel wheelbakedmodel = blockrenderdispatcher.getBlockModel(wheelblockstate);
+		            
 		            //HashMap<String,Vec3> Model = ModelScales.get(entityIn.getCarType());
 		            //float scaleVsChassis = (float) ( 0.331178F);//scalelist.get("LongestChassisAxis").x /*scalelist.get("LongestWheelAxis").x*/ );
 		            
@@ -316,11 +396,13 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 	    	  else {
 	    		  rendertype = p_174503_.getBuffer(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
 	    	  }
-	    	  
+	    	  Random random = new Random();
+	    	  random.setSeed(42L);
+	         //renderQuadList(p_174502_.last(), rendertype, (float)Color.x, (float)Color.y, (float)Color.z, p_174509_.getQuads(p_174507_, (Direction)null, random, EmptyModelData.INSTANCE), p_174504_, p_174508_); 
 	    	  
 	         p_174506_.getModelRenderer().renderModel(p_174502_.last(), rendertype, p_174507_, p_174509_, (float)Color.x, (float)Color.y, (float)Color.z, p_174504_, p_174508_, EmptyModelData.INSTANCE); 
 	      } else {
-	         p_174506_.renderSingleBlock(p_174507_, p_174502_, p_174503_, p_174504_, p_174508_, EmptyModelData.INSTANCE);
+	         //p_174506_.renderSingleBlock(p_174507_, p_174502_, p_174503_, p_174504_, p_174508_, EmptyModelData.INSTANCE);
 	      }
 	}
 	
