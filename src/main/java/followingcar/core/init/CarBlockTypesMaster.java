@@ -16,9 +16,9 @@ public class CarBlockTypesMaster{
 			//car type "0" (Default)
 			put(0, new HashMap<Integer,Block>(){
 				private static final long serialVersionUID = 1669012493234372576L;{ 
-				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypebody0")));
-				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypewheel0")));
-				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypecolor0")));
+				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypebody0")));
+				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypewheel0")));
+				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypecolor0")));
 			}}
 			);
 			
@@ -26,18 +26,18 @@ public class CarBlockTypesMaster{
 			//car type "1" (Kodachi)
 			put(1, new HashMap<Integer,Block>(){
 				private static final long serialVersionUID = 1669012493234372576L;{ 
-				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypebody1")));
-				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypewheel1")));
-				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypecolor1")));
+				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypebody1")));
+				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypewheel1")));
+				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypecolor1")));
 			}}
 			);
 			
 			//car type "2" (Fumei)
 			put(2, new HashMap<Integer,Block>(){
 				private static final long serialVersionUID = -2486865856115640642L;{ 
-				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypebody2")));
-				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypewheel2")));
-				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.Location("cartypecolor2")));
+				put(0,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypebody2")));
+				put(1,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypewheel2")));
+				put(2,new CarTypeObjBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL)).setRegistryName(MainFollowingCar.ExtrasLocation("cartypecolor2")));
 			}}
 			);
 		}

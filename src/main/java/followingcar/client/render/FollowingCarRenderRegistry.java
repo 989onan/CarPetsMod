@@ -30,7 +30,7 @@ public class FollowingCarRenderRegistry {
 
 	{
 		put(0,new ModelLayerLocation(FollowingCarRender.Colortextures.get(0),"DefaultModel"));
-		//put(1,new ModelLayerLocation(FollowingCarRender.Colortextures.get(1),"ae86"));
+		put(1,new ModelLayerLocation(FollowingCarRender.Colortextures.get(1),"ae86"));
 		
 	}};
 	
@@ -42,11 +42,6 @@ public class FollowingCarRenderRegistry {
 		ModelTextures.forEach((k,texture) -> {
 			event.registerLayerDefinition(texture, ()->FollowingCarModel.createBodyMesh(CubeDeformation.NONE) );
 		});
-	}
-	
-	public FollowingCarRenderRegistry() {
-		//MainFollowingCar.LOGGER.info("Hello?");
-		
 	}
 	
 	@SubscribeEvent

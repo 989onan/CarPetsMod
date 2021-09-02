@@ -181,12 +181,17 @@ public class MainFollowingCar {
 	public static ResourceLocation Location(String name) {
     	return new ResourceLocation(MODID,name);
     }
+	public static ResourceLocation ExtrasLocation(String name) {
+		return new ResourceLocation(MODID+"extras",name);
+	}
 	
 	@SubscribeEvent
 	public void setup(final EntityAttributeCreationEvent event)
 	{
 		event.put((EntityType<? extends LivingEntity>)EntityTypeInit.FOLLOWING_CAR, FollowingCar.setCustomAttributes());
     }
+
+	
 	
 	
 }

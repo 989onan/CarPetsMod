@@ -57,7 +57,7 @@ public class FollowingCarRender extends MobRenderer<FollowingCar, FollowingCarMo
 	
 	public FollowingCarRender(EntityRendererProvider.Context p_173943_) {
 		super(p_173943_, new FollowingCarModel<>(p_173943_.bakeLayer(FollowingCarRenderRegistry.ModelTextures.get(0))), 1f);
-		//this.addLayer(new FollowingCarColorLayer(this,p_173943_.getModelSet()));
+		this.addLayer(new FollowingCarColorLayer(this,p_173943_.getModelSet()));
 		this.addLayer(new FollowingCarModelLayer(this,p_173943_.getModelSet()));
 	}
 	

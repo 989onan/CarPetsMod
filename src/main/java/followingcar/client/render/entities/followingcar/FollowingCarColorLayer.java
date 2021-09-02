@@ -5,6 +5,7 @@ package followingcar.client.render.entities.followingcar;
 
 
 import followingcar.client.render.FollowingCarRenderRegistry;
+
 import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.common.entities.FollowingCar;
 
@@ -53,8 +54,14 @@ public class FollowingCarColorLayer extends RenderLayer<FollowingCar, FollowingC
 		}
 		else if(FollowingCarRender.NameToVariant.get(name) != null) {
 			if(CarBlockTypesMaster.CarObjModels.get(FollowingCarRender.NameToVariant.get(name)) == null && CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null){
-				coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(FollowingCarRender.NameToVariant.get(name)), FollowingCarRender.Colortextures.get(FollowingCarRender.NameToVariant.get(name)), p_117349_, p_117350_, p_117351_, entityIn,
+				if(Models.get(FollowingCarRender.NameToVariant.get(name)) != null) {
+					coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(FollowingCarRender.NameToVariant.get(name)), FollowingCarRender.Colortextures.get(FollowingCarRender.NameToVariant.get(name)), p_117349_, p_117350_, p_117351_, entityIn,
 		     			p_117353_, p_117354_,p_117355_, p_117356_, p_117357_, p_117358_,afloat[0], afloat[1], afloat[2]);
+				}
+				else {
+					coloredCutoutModelCopyLayerRender(this.getParentModel(), Models.get(0), FollowingCarRender.Colortextures.get(0), p_117349_, p_117350_, p_117351_, entityIn,
+			     			p_117353_, p_117354_,p_117355_, p_117356_, p_117357_, p_117358_,afloat[0], afloat[1], afloat[2]);
+				}
 			}
 			else {
 				//don't render a color layer from the block models. the obj models take care of this..

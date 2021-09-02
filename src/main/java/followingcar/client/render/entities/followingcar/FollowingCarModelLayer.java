@@ -194,40 +194,64 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
         	 }
         	 
         	 
-        	 
+        	 //BakedModel missingmodel = blockrenderdispatcher.getBlockModelShaper().getModelManager().getMissingModel();
         	 
     		 Vec3 scale = new Vec3(1.5,1.5,1.5);
     		 HashMap<String,Vec3> scalelist = ModelScales.get(type);
     		 
     		 if(current.get(type) == null){ //we chache on the first frame, so for the first frame it's not rendered
     			 if(model != null) {
-    				 current.put(type, new HashMap<Integer,modelstore>());
-            		 HashMap<Integer,modelstore> bakedmodel = current.get(type);
+    				 
+    				 
             		 
             		 
             		 BlockState bodyblockstate = model.get(0).defaultBlockState();
-        			 
 		             
+            		 
 		             BakedModel bodybakedmodel = blockrenderdispatcher.getBlockModel(bodyblockstate);
+		             
+		             
 		             
 		             BlockState colorblockstate = model.get(2).defaultBlockState();
 		             BakedModel colorbakedmodel = blockrenderdispatcher.getBlockModel(colorblockstate);
     				 
-    				 
-    				 bakedmodel.put(0, new modelstore(bodybakedmodel,bodyblockstate));
-    				 
-    				 BlockState wheelblockstate = model.get(1).defaultBlockState();
+		             BlockState wheelblockstate = model.get(1).defaultBlockState();
     				 BakedModel wheelbakedmodel = blockrenderdispatcher.getBlockModel(wheelblockstate);
-    				 bakedmodel.put(1, new modelstore(wheelbakedmodel,wheelblockstate));
     				 
     				 colorbakedmodel = cachequads(colorbakedmodel, colorblockstate);
-    				 bakedmodel.put(2,new modelstore(colorbakedmodel,colorblockstate));
+    				 
+    				 boolean gotnonerrormodel = false;
+    				 
+    				 if (bodybakedmodel.getQuads(bodyblockstate, null, new Random(), EmptyModelData.INSTANCE).size() >= 1) {
+    					 if (wheelbakedmodel.getQuads(wheelblockstate, null, new Random(), EmptyModelData.INSTANCE).size() >= 1) {
+    						 if (colorbakedmodel.getQuads(colorblockstate, null, new Random(), EmptyModelData.INSTANCE).size() >= 1) {
+    							 gotnonerrormodel = true;
+    							 current.put(type, new HashMap<Integer,modelstore>());
+    							 HashMap<Integer,modelstore> bakedmodel = current.get(type);
+    							 bakedmodel.put(0, new modelstore(bodybakedmodel,bodyblockstate));
+    		    				 
+    		    				 
+    		    				 bakedmodel.put(1, new modelstore(wheelbakedmodel,wheelblockstate));
+    		    				 
+    		    				 
+    		    				 bakedmodel.put(2,new modelstore(colorbakedmodel,colorblockstate));
+            				 }
+        				 }
+    				 }
+		             
+    				 if(!gotnonerrormodel) {
+    					 CarBlockTypesMaster.CarObjModels.remove(type);
+    					 CarBlockTypesMaster.CarObjModelsHigh.remove(type);
+    				 }
+		             
+    				
     				 
             		 
             		 
     			 }
         	 }
     		 else {//after the first frame it should be chached, so grab the chache and render.
+    			 //if it didn't chache it on the first frame, because it couldn't find it, this won't run
     			 
 	    		 modelstore body = current.get(type).get(0);
 	    		 modelstore wheel = current.get(type).get(1);
@@ -236,6 +260,9 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 	    		 BakedModel bodybakedmodel = body.model;
 	    		 BakedModel wheelbakedmodel = wheel.model;
 	    		 BakedModel colorbakedmodel = color.model;
+	    		 
+	    		 
+	    		 
 	    		 
 	    		 BlockState bodyblockstate = body.state;
 	    		 BlockState wheelblockstate = wheel.state;

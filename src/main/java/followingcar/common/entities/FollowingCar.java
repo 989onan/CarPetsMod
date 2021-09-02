@@ -6,24 +6,27 @@ package followingcar.common.entities;
 
 import java.util.ArrayList;
 
+
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-
 
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
@@ -49,10 +52,12 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.DyeItem;
 
 public class FollowingCar extends TamableAnimal implements PlayerRideable{
@@ -206,6 +211,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 				this.openDoorTime.set(i, 0);
 			}
 		}
+		//this.travel(new Vec3(1,0,1));
 		
 	}
 		
@@ -243,6 +249,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 			if(this.getCarType() == 0) {
 				y-=.7;
 			}
+			
 
 			Vec3 vector3d = (new Vec3((double)y, 0.0D, (double)x)).yRot(-(this.getYRot()) * ((float)Math.PI / 180F) - ((float)Math.PI / 2F));
 			
@@ -267,7 +274,10 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 
 
 	float lastcntrlx = 0.0F;
+	Vec3 motion = new Vec3(0,0,0);
+	
 	//moving car with player
+	/*
 	@Override
 	public void travel(Vec3 travelVector) {
 
@@ -316,7 +326,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 				float rotationspeed = ((float)this.clamp(((int)((speed-0.1F)*1000)), 0, 4000))/3900;
 				
 				if(cntrly != 0.0F) {
-					float newrot = ((((-3.9F*((rotationspeed-0.5F)*(rotationspeed-0.5F))))+1)* /*Max turn angle speed:*/15)*(-cntrly*(Math.abs(lastcntrlx)/lastcntrlx));
+					float newrot = ((((-3.9F*((rotationspeed-0.5F)*(rotationspeed-0.5F))))+1)* 15)*(-cntrly*(Math.abs(lastcntrlx)/lastcntrlx));
 					
 					this.setYRot(this.getYRot()+newrot);
 					this.deltarotation = newrot/3.1F;
@@ -345,12 +355,274 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 		}
 
 	}
-
+	*/
 	
 	@Override
-	 public Vec3 getLightProbePosition(float p_20309_) {
-	      return new Vec3(this.getOnPos().getX()+p_20309_,this.getOnPos().getY()+p_20309_,this.getOnPos().getZ()+p_20309_);
-	 }
+	public void travel(Vec3 travelVector) {
+
+		if (this.getPassengers().size() > 0) {
+			this.maxUpStep = 1.1F;
+			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(this.getPassengers().size()-1);//make the last passenger the controlling one, but since the display of the passenger...
+			//positions is shifted, the person that is visually the first is the one controlling.
+			
+			
+			
+			
+			float cntrlx = livingentity.zza;
+			float cntrly = livingentity.xxa;
+			
+			
+			//this code makes the car speed up and slow down if old movement is disabled. Else, use old movement.
+			float speed = this.getSpeed();
+			if(!FollowingCarConfig.oldmovement.get()) {
+				Vec3 motion = this.getDeltaMovement();
+				//above is beginning stuff don't touch!
+				
+				
+				float defaultAcc = .1F;
+				
+				motion = motion.add(getInputVector(1,new Vec3(0,0,defaultAcc*cntrlx),this.getYRot()));
+				
+				
+				
+				this.setSpeed(speed);
+				
+				this.setDeltaMovement(motion);
+				this.setSpeed(1F);
+				this.supertravel(new Vec3(0,0,0));
+				
+			}
+			else {//else use simple old movement
+				Vec3 motion = new Vec3(0,0,cntrlx);
+
+				this.setSpeed(Math.abs(cntrlx));
+				this.setYRot(this.getYRot()+(cntrly*5));
+				super.travel(motion);
+			}
+
+			
+
+
+		}
+		else {
+			super.travel(travelVector);
+		}
+
+	}
+	
+	
+	private static Vec3 getInputVector(float p_20017_, Vec3 p_20016_, float p_20018_) {
+	      double d0 = p_20016_.lengthSqr();
+	      if (d0 < 1.0E-7D) {
+	         return Vec3.ZERO;
+	      } else {
+	         Vec3 vec3 = (d0 > 1.0D ? p_20016_.normalize() : p_20016_).scale((double)p_20017_);
+	         float f = Mth.sin(p_20018_ * ((float)Math.PI / 180F));
+	         float f1 = Mth.cos(p_20018_ * ((float)Math.PI / 180F));
+	         return new Vec3(vec3.x * (double)f1 - vec3.z * (double)f, vec3.y, vec3.z * (double)f1 + vec3.x * (double)f);
+	      }
+	   }
+	
+	@SuppressWarnings("deprecation")
+	public void supertravel(Vec3 p_21280_) {
+		LivingEntity livingentity = (LivingEntity)this.getPassengers().get(this.getPassengers().size()-1);
+	      if (this.isEffectiveAi() || this.isControlledByLocalInstance()) {
+	         double adjustedgravity = 0.08D;
+	         AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
+	         boolean flag = this.getDeltaMovement().y <= 0.0D;
+	         adjustedgravity = gravity.getValue();
+
+	         FluidState fluidstate = this.level.getFluidState(this.blockPosition());
+	         if (this.isInWater() && this.isAffectedByFluids() && !this.canStandOnFluid(fluidstate.getType())) {
+	            double d8 = this.getY();
+	            float f5 = this.isSprinting() ? 0.9F : this.getWaterSlowDown();
+	            float f6 = 0.02F;
+	            float f7 = (float)EnchantmentHelper.getDepthStrider(this);
+	            if (f7 > 3.0F) {
+	               f7 = 3.0F;
+	            }
+
+	            if (!this.onGround) {
+	               f7 *= 0.5F;
+	            }
+
+	            if (f7 > 0.0F) {
+	               f5 += (0.54600006F - f5) * f7 / 3.0F;
+	               f6 += (this.getSpeed() - f6) * f7 / 3.0F;
+	            }
+
+	            if (this.hasEffect(MobEffects.DOLPHINS_GRACE)) {
+	               f5 = 0.96F;
+	            }
+
+	            f6 *= (float)this.getAttribute(net.minecraftforge.common.ForgeMod.SWIM_SPEED.get()).getValue();
+	            //this.moveRelative(f6, p_21280_);
+	            this.move(MoverType.SELF, this.getDeltaMovement());
+	            Vec3 vec36 = this.getDeltaMovement();
+	            if (this.horizontalCollision && this.onClimbable()) {
+	               vec36 = new Vec3(vec36.x, 0.2D, vec36.z);
+	            }
+
+	            this.setDeltaMovement(vec36.multiply((double).1, (double)0.8F, (double).1));
+	            Vec3 vec32 = this.getFluidFallingAdjustedMovement(adjustedgravity, flag, this.getDeltaMovement());
+	            this.setDeltaMovement(vec32);
+	            if (this.horizontalCollision && this.isFree(vec32.x, vec32.y + (double)0.6F - this.getY() + d8, vec32.z)) {
+	               this.setDeltaMovement(vec32.x, (double)0.3F, vec32.z);
+	            }
+	         } else if (this.isInLava() && this.isAffectedByFluids() && !this.canStandOnFluid(fluidstate.getType())) {
+	            double d7 = this.getY();
+	            //this.moveRelative(0.02F, p_21280_);
+	            this.move(MoverType.SELF, this.getDeltaMovement());
+	            if (this.getFluidHeight(FluidTags.LAVA) <= this.getFluidJumpThreshold()) {
+	               this.setDeltaMovement(this.getDeltaMovement().multiply(0.5D, (double)0.8F, 0.5D));
+	               Vec3 vec33 = this.getFluidFallingAdjustedMovement(adjustedgravity, flag, this.getDeltaMovement());
+	               this.setDeltaMovement(vec33);
+	            } else {
+	               this.setDeltaMovement(this.getDeltaMovement().scale(0.5D));
+	            }
+
+	            if (!this.isNoGravity()) {
+	               this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -adjustedgravity / 4.0D, 0.0D));
+	            }
+
+	            Vec3 vec34 = this.getDeltaMovement();
+	            if (this.horizontalCollision && this.isFree(vec34.x, vec34.y + (double)0.6F - this.getY() + d7, vec34.z)) {
+	               this.setDeltaMovement(vec34.x, (double)0.3F, vec34.z);
+	            }
+	         } else if (this.isFallFlying()) {
+	            Vec3 vec3 = this.getDeltaMovement();
+	            if (vec3.y > -0.5D) {
+	               this.fallDistance = 1.0F;
+	            }
+
+	            Vec3 vec31 = this.getLookAngle();
+	            float f = this.getXRot() * ((float)Math.PI / 180F);
+	            double d1 = Math.sqrt(vec31.x * vec31.x + vec31.z * vec31.z);
+	            double d3 = vec3.horizontalDistance();
+	            double d4 = vec31.length();
+	            float f1 = Mth.cos(f);
+	            f1 = (float)((double)f1 * (double)f1 * Math.min(1.0D, d4 / 0.4D));
+	            vec3 = this.getDeltaMovement().add(0.0D, adjustedgravity * (-1.0D + (double)f1 * 0.75D), 0.0D);
+	            if (vec3.y < 0.0D && d1 > 0.0D) {
+	               double d5 = vec3.y * -0.1D * (double)f1;
+	               vec3 = vec3.add(vec31.x * d5 / d1, d5, vec31.z * d5 / d1);
+	            }
+
+	            if (f < 0.0F && d1 > 0.0D) {
+	               double d9 = d3 * (double)(-Mth.sin(f)) * 0.04D;
+	               vec3 = vec3.add(-vec31.x * d9 / d1, d9 * 3.2D, -vec31.z * d9 / d1);
+	            }
+
+	            if (d1 > 0.0D) {
+	               vec3 = vec3.add((vec31.x / d1 * d3 - vec3.x) * 0.1D, 0.0D, (vec31.z / d1 * d3 - vec3.z) * 0.1D);
+	            }
+
+	            this.setDeltaMovement(vec3.multiply((double)0.99F, (double)0.98F, (double)0.99F));
+	            this.move(MoverType.SELF, this.getDeltaMovement());
+	            if (this.horizontalCollision && !this.level.isClientSide) {
+	               double d10 = this.getDeltaMovement().horizontalDistance();
+	               double d6 = d3 - d10;
+	               float f2 = (float)(d6 * 10.0D - 3.0D);
+	               if (f2 > 0.0F) {
+	                  this.playSound(this.getFallDamageSound((int)f2), 1.0F, 1.0F);
+	                  this.hurt(DamageSource.FLY_INTO_WALL, f2);
+	               }
+	            }
+
+	            if (this.onGround && !this.level.isClientSide) {
+	               this.setSharedFlag(7, false);
+	            }
+	         } else {
+	        	
+	        	 
+	        	 
+	            BlockPos blockpos = this.getBlockPosBelowThatAffectsMyMovement();
+	            float f3 = this.level.getBlockState(this.getBlockPosBelowThatAffectsMyMovement()).getFriction(level, this.getBlockPosBelowThatAffectsMyMovement(), this);
+	            
+	            //first we calculate friction based on whether gas is being pressed or not
+	            float f4 = this.onGround ? Mth.clamp(f3*(Math.abs(livingentity.zza)>0.1F ? 1.6F : 1.5F),0F, .98F) : 1F;
+	            
+	            
+	            //next we calculate the dot product between 90 degrees from forward and the momentum direction
+			    Vec3 A = this.getDeltaMovement();
+			    Vec3 B = this.getForward().yRot(90*((float)Math.PI / 180F));
+			    
+			    float top = (float) ((A.x*B.x)+(A.y*B.y)+(A.z*B.z));
+			    float bottom = (float) ((Math.pow(Math.pow(A.x,2)+Math.pow(A.y,2)+Math.pow(A.z,2),.5D))*(Math.pow(Math.pow(B.x,2)+Math.pow(B.y,2)+Math.pow(B.z,2),.5D)));
+	            
+			   
+			    float sidewaysfactor = (-(top/bottom));
+			    
+			    //reverse the factor so it says if it's going sideways not forward 
+			    sidewaysfactor = Math.abs(sidewaysfactor-1);
+			    
+			    //multiply the factor by 5 so the strength isn't like... go to 0 speed instantly when going almost perfectly sideways
+			    sidewaysfactor = Mth.clamp((sidewaysfactor+.1F)*3.2F,0,1);
+			    
+			    
+			    LOGGER.info("sidewaysfactor: "+sidewaysfactor); //debugging
+			    
+			    //multiply friction by going sideways
+			    f4 = this.onGround ? Mth.clamp(f4 * ((float)(sidewaysfactor)),0F,.98F): 1F; //multiply friction by sideways factor to get friction increased by 2 times when going sideways
+	            
+	            
+	            //end sideways friction block
+			    
+	            Vec3 vec35 = this.handleRelativeFrictionAndCalculateMovement(p_21280_, f3);
+	            double d2 = vec35.y;
+	            if (this.hasEffect(MobEffects.LEVITATION)) {
+	               d2 += (0.05D * (double)(this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1) - vec35.y) * 0.2D;
+	               this.fallDistance = 0.0F;
+	            } else if (this.level.isClientSide && !this.level.hasChunkAt(blockpos)) {
+	               if (this.getY() > (double)this.level.getMinBuildHeight()) {
+	                  d2 = -0.1D;
+	               } else {
+	                  d2 = 0.0D;
+	               }
+	            } else if (!this.isNoGravity()) {
+	               d2 -= adjustedgravity;
+	            }
+
+	            if (this.shouldDiscardFriction()) {
+	               this.setDeltaMovement(vec35.x, d2, vec35.z);
+	            } else {
+	               this.setDeltaMovement(vec35.x * (double)f4, d2 * (double)0.9999F, vec35.z * (double)f4);
+	            }
+	            this.deltarotation = 0F;
+	            float rotationspeed = (Math.abs((sidewaysfactor-.5F)*(float)(this.getDeltaMovement().dot(this.getForward())))*10);
+		  	    if(livingentity.xxa != 0.0F) {
+		  	    	this.setYRot(this.getYRot()+(rotationspeed*-((Math.abs(livingentity.xxa)/livingentity.xxa)*(Math.abs(livingentity.zza)/livingentity.zza))));
+		  	    	this.deltarotation = rotationspeed/3.1F;
+		  	    	
+		  	    }
+		  	    
+	         }
+	      }
+	     
+	      //motion = this.getDeltaMovement();
+	      this.calculateEntityAnimation(this, this instanceof FlyingAnimal);
+	   }
+	@Override
+	protected float getWaterSlowDown() {
+	      return 0F;
+	   }
+	
+	@Override
+	public Vec3 getFluidFallingAdjustedMovement(double p_20995_, boolean p_20996_, Vec3 p_20997_) {
+	      if (!this.isNoGravity() && !this.isSprinting()) {
+	         double d0;
+	         if (p_20996_ && Math.abs(p_20997_.y - 0.005D) >= 0.003D && Math.abs(p_20997_.y - p_20995_ / 16.0D) < 0.003D) {
+	            d0 = -0.003D;
+	         } else {
+	            d0 = p_20997_.y - p_20995_ / 3.0D;
+	         }
+
+	         return new Vec3(p_20997_.x, d0, p_20997_.z);
+	      } else {
+	         return p_20997_;
+	      }
+	   }
+	
 	
 	@Override
 	public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource p_147189_) {
