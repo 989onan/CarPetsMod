@@ -260,7 +260,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 								poseStack.translate(scalelist.get("WheelL_"+i+"_Offset").x*scale.x, -scalelist.get("WheelL_"+i+"_Offset").y*scale.y, scalelist.get("WheelL_"+i+"_Offset").z*scale.z);
 								
 								if(i==1) {//car turn
-									 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*30)));
+									 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*CarTypeRegistry.WheelAngle)));
 								 }
 								
 								
@@ -289,7 +289,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 							 poseStack.translate(-scalelist.get("WheelL_"+i+"_Offset").x*scale.x, -scalelist.get("WheelL_"+i+"_Offset").y*scale.y, scalelist.get("WheelL_"+i+"_Offset").z*scale.z);///scalelist.get("LongestChassisAxis").x);
 							
 							 if(i==1) {//car turn
-								 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*30)));
+								 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*CarTypeRegistry.WheelAngle)));
 							 }
 				             poseStack.mulPose(Vector3f.YN.rotationDegrees(180.0F));
 				             

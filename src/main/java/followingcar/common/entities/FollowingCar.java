@@ -4,6 +4,7 @@ package followingcar.common.entities;
 
 
 import java.util.ArrayList;
+
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.world.item.DyeColor;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
@@ -587,37 +589,46 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 	            float f4 = this.onGround ? Mth.clamp(f3*(Math.abs(livingentity.zza)>0.1F ? 1.6F : 1.5F),0F, .98F) : 1F;
 	            
 	            //get the max speed and current speed from before.
-	            float maxspeed = (CarTypeRegistry.CarTypes.get(this.getActualCarType()).getMaxSpeed()/2.23694F);
+	            //float maxspeed = (CarTypeRegistry.CarTypes.get(this.getActualCarType()).getMaxSpeed()/2.23694F);
 		  	    float curspeed = (float) ((this.getDeltaMovement().horizontalDistance()))/(1F/20F);
 	            
 	            //next we calculate the dot product between 90 degrees from forward and the momentum direction
 			    
-			    Vec3 B = this.getForward().yRot(90*((float)Math.PI / 180F));
+			    Vec3 B = this.getForward().yRot(((float)Math.PI / 180F)*10);
 			    
 			    float top = (float) ((A.x*B.x)+(A.y*B.y)+(A.z*B.z));
 			    float bottom = (float) ((Math.pow(Math.pow(A.x,2)+Math.pow(A.y,2)+Math.pow(A.z,2),.5D))*(Math.pow(Math.pow(B.x,2)+Math.pow(B.y,2)+Math.pow(B.z,2),.5D)));
 			   
 			    float sidewaysfactor = Math.abs(-(top/bottom));
 			    
-			    sidewaysfactor = Mth.clamp(sidewaysfactor/((curspeed+60F)/maxspeed),.4F,1F);
+			    Vec3 WheelOffset1 = CarTypeRegistry.CarTypes.get(this.getActualCarType()).getWheelOffsets().get("WheelL_1_Offset");
+			    Vec3 WheelOffset2 = CarTypeRegistry.CarTypes.get(this.getActualCarType()).getWheelOffsets().get("WheelL_2_Offset");
+			    
+			    //shrink to 2D vectors, trashing y.
+			    Vec2 WheelFL = new Vec2((float)WheelOffset1.multiply(1, 0, 1).x,(float)WheelOffset1.multiply(1, 0, 1).z);
+			    //Vec2 WheelFR = new Vec2((float)WheelOffset1.multiply(-1, 0, 1).x,(float)WheelOffset1.multiply(-1, 0, 1).z);
+			    Vec2 WheelRL = new Vec2((float)WheelOffset2.multiply(1, 0, 1).x,(float)WheelOffset2.multiply(1, 0, 1).z);
+			    // Vec2 WheelRR = new Vec2((float)WheelOffset2.multiply(-1, 0, 1).x,(float)WheelOffset2.multiply(-1, 0, 1).z);
+			    
+			    double radius = (WheelFL.y-WheelRL.y)/Math.tan(Mth.DEG_TO_RAD*CarTypeRegistry.WheelAngle);
+			    
+			    //double delta = 90-(this.rotationsign*CarTypeRegistry.WheelAngle);
+			    
+			    
+			    
+			    
 			    
 			    
 			    
 			    //reverse the factor because if it's not going sideways it will be 1 instead of 0 which will multiply by the friction.
-			    sidewaysfactor = Math.abs(sidewaysfactor-1);
 			    
-			    
-			    sidewaysfactor = Mth.clamp((sidewaysfactor*((CarTypeRegistry.CarTypes.get(this.getActualCarType()).getDriftMultiplier()+.001F))),.001F,1F);
-			    //multiply the factor by drift factor so the strength isn't like... go to 0 speed instantly when going almost perfectly sideways
-			    //if the drift factor is 0, then it 
-			    if(curspeed/maxspeed < .1F && Math.abs(livingentity.zza) < 0.1F) {
-			    	sidewaysfactor = .2F;
-			    }
 			    
 			    //LOGGER.info("sidewaysfactor: "+sidewaysfactor); //debugging
 			    //multiply friction by going sideways
 			    f4 = this.onGround ? Mth.clamp((f4*CarTypeRegistry.CarTypes.get(this.getActualCarType()).getRollFrictionMultiplier()) * ((float)(sidewaysfactor)),0F,.98F): 1F; //multiply friction by sideways factor to get friction increased by 2 times when going sideways
-		  	    
+			    
+			    
+			    float rotationspeed = (float) (curspeed/radius);
 	            
 	            //end sideways friction block
 			    
@@ -643,7 +654,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 	            }
 	            this.deltarotation = 0F;
 	            
-	            float rotationspeed = 10/(Math.abs(10F*(float)(curspeed+(maxspeed/4F))/maxspeed));
+	            
 		  	    if(livingentity.xxa != 0.0F) {
 		  	    	double speeddirection = (this.getDeltaMovement().dot(this.getForward()));
 		  	    	if(Math.abs(speeddirection) < .01F) {

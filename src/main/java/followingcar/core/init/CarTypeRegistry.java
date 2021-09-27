@@ -367,6 +367,7 @@ public class CarTypeRegistry {
 	
 	//determines the scale for all cars. If this becomes different on the client due to another mod changing it client side only, expect visual bugs!
 	public static final double CarScale = 1.5;
+	public static final float WheelAngle = 30;//degrees wheels should rotate
 	
 	//custom names to make a car type appear if it is named this. It can also become one of these
 	//if a conversion kit is used.

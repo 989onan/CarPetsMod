@@ -21,12 +21,12 @@ public class itemsmaster {
 	public static Item acid = new ToolTipItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"I shouldn't, and won't place this down!",true,false,15).setRegistryName(MainFollowingCar.MODID+":acid");
 	
 	//Engines
-	public static Item Dead_Engine = new ToolTipItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"This engine seems to not work in the world of Minecraft\ndue to the magic in the air.\nMaybe it needs magic to run? (AHEM.. Use a soul gotten from blasting soul sand.)",true,false,15).setRegistryName(MainFollowingCar.MODID+":dead_engine");
+	public static Item Dead_Engine = new ToolTipItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"This engine seems to not work in the world of Minecraft due to the magic in the air. \nMaybe it needs magic to run? \n (AHEM.. Use a soul gotten from blasting soul sand.)",true,false,15).setRegistryName(MainFollowingCar.MODID+":dead_engine");
 	public static Item Alive_Engine = new ToolTipItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"It's Alive!!! Oops... Well let's try it anyway...\nThis is alive and innocent!",true,false,15).setRegistryName(MainFollowingCar.MODID+":alive_engine");
 	
 	
 	//car changer
-	public static Item CarChanger = new CarChangerItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"Shift right click not on a car to change target car type.\nRight click on car to change it's type.\nCan only be used once.",true,false,15).setRegistryName(MainFollowingCar.MODID+":car_changer");
+	public static Item CarChanger = new CarChangerItem(new Item.Properties().stacksTo(64).tab(CreativeModeTab.TAB_MATERIALS),"Shift right click not on a car to change target car type.\nRight click on car to change it's type.\nConsumed on use.",true,false,15).setRegistryName(MainFollowingCar.MODID+":car_changer");
 	
 	
 	//spawn egg registers

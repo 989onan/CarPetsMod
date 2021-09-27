@@ -16,8 +16,8 @@
 	
 	"entity.followingcarmod.following_car": "Car Pet",
 	
-	
-	"followingcarmod.subtitle.car_purrs": "Car pet purrs",
-	"followingcarmod.subtitle.car_revs": "Car pet engine",
-	"followingcarmod.subtitle.car_cutenoise": "Car pet rumbles cutely"
+	"followingcarmod.subtitle.car_hurt":"Car Pet Hurt",
+	"followingcarmod.subtitle.car_purrs": "Car Pet Purrs",
+	"followingcarmod.subtitle.car_revs": "Car Pet Engine",
+	"followingcarmod.subtitle.car_cutenoise": "Car Pet Rumbles Cutely"
 }
