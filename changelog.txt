@@ -1,3 +1,112 @@
+Build: 1.17.1-37.0.44 - Mon Aug 23 17:52:30 GMT 2021
+	cyborgmas:
+		Minor resource pack related fixes (#7884)
+
+=========
+Build: 1.17.1-37.0.43 - Sun Aug 22 01:30:31 GMT 2021
+	lexmanos:
+		Fix misaligned patch causing monsters to not spawn in nether fortresses correctly.
+
+=========
+Build: 1.17.1-37.0.42 - Fri Aug 20 19:38:58 GMT 2021
+	diesieben07:
+		Add RegisterCapabilitiesEvent (#8021)
+
+=========
+Build: 1.17.1-37.0.41 - Thu Aug 19 21:31:20 GMT 2021
+	Commoble:
+		Move static ITEM_TIER_ORDERING_JSON resourcelocation declaration from anonymous class into outer class to work around eclipse compiler error. (#8018)
+
+=========
+Build: 1.17.1-37.0.40 - Thu Aug 19 05:44:39 GMT 2021
+	sizableshrimp:
+		Fix entities not spawning in structures (#8020)
+		
+		This affects swamp huts, pillager outposts, ocean monuments, and nether fortresses
+
+=========
+Build: 1.17.1-37.0.39 - Wed Aug 18 20:49:43 GMT 2021
+	Commoble:
+		Add support for forge's "remove" list to tag datagenerators (#7911)
+
+=========
+Build: 1.17.1-37.0.38 - Wed Aug 18 20:05:33 GMT 2021
+	sirttas:
+		Add hook to allow items to customize the attack sweep range. (#7981)
+
+=========
+Build: 1.17.1-37.0.37 - Wed Aug 18 19:46:48 GMT 2021
+	git:
+		Track the active mod within DeferredWorkQueue (#7973)
+
+=========
+Build: 1.17.1-37.0.36 - Wed Aug 18 09:16:16 GMT 2021
+	28724985+strikerrocker:
+		Allow to check spawner block entity in events (#7941)
+
+=========
+Build: 1.17.1-37.0.35 - Wed Aug 18 05:02:56 GMT 2021
+	cyborgmas:
+		Remove neutral mob patches as the bug was fixed upstream. (#8001)
+
+=========
+Build: 1.17.1-37.0.34 - Sun Aug 15 14:18:49 GMT 2021
+	malte0811:
+		Ensure that all render targets in a PostChain use the same format (#7978)
+		
+		closes #6995
+
+=========
+Build: 1.17.1-37.0.33 - Thu Aug 12 08:44:46 GMT 2021
+	sizableshrimp:
+		Fix update checker to use runtime minecraft version (#8000)
+
+=========
+Build: 1.17.1-37.0.32 - Wed Aug 11 01:53:28 GMT 2021
+	67878524+vemerion:
+		Correct incorrect arguments for render hand event (#7987)
+
+=========
+Build: 1.17.1-37.0.31 - Tue Aug 10 22:45:23 GMT 2021
+	gigaherz:
+		Redesign the tool system to rely on the new vanilla tags. (#7970)
+		
+		Changed:
+		- ToolType is replaced with ToolAction, which can selectively represent which actions are supported by an item.
+		- Added a canPerformAction method to query ToolActions.
+		- Renamed canHarvestBlock to isCorrectToolForDrops to match vanilla.
+		- Added TierSortingRegistry, which can be used to add custom tiers and supports sorting between vanilla or with other mods.
+		
+		How to use:
+		
+		For the breaking system there's 2 methods:
+		- getDestroySpeed decides if an item *can* mine the block fast. Override if you have multiple tags or your item isn't a DiggerItem.
+		- isCorrectToolForDrops decides if an item will get drops. Returning false will also slow down mining, regardless of getDestroySpeed. Override if you have type-dependant tiers or your item isn't a DiggerItem.
+		
+		For the tier system mods can just call `TierSortingRegistry.registerTier(tier, "name", List.of(lesser tiers), List.of(better tiers));` to register their tiers.
+		There's helper methods to query tiers such as TierSortingRegsitry.isCorrectTierForDrops.
+		
+		The ToolActions solve 2 problems:
+		1. distinguishing which kind of digger an item can be
+		2. querying if the item can perform specific secondary actions.
+		Any item can override `canPerformAction` to customize which actions it performs.
+
+=========
+Build: 1.17.1-37.0.30 - Tue Aug 10 20:11:07 GMT 2021
+	lexmanos:
+		Fixed reference to registryAccess in dimension fix, and marked for removal in next MC version. Closes #7961
+
+=========
+Build: 1.17.1-37.0.29 - Tue Aug 10 07:11:36 GMT 2021
+	lexmanos:
+		Bump BootStrapLauncher, and make sure Capability providers call parent revive.
+
+=========
+Build: 1.17.1-37.0.28 - Mon Aug 09 19:09:40 GMT 2021
+	sirttas:
+		Fix custom ingredients not being read correctly over the network. (#7980)
+
+=========
 Build: 1.17.1-37.0.27 - Fri Aug 06 17:18:27 GMT 2021
 	djbake101:
 		Add a OnDatapackSyncEvent, useful as a notification for modders to send extra data to the client (#7912)

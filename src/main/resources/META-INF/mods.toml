@@ -14,16 +14,16 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/car-pets" #optional
 logoFile="followingcaricon.png"
 
 #needed so that people know when to update
-updateJSONURL= "https://github.com/989onan/CarPetsMod/blob/main/updates.json"
+updateJSONURL= "https://raw.githubusercontent.com/989onan/CarPetsMod/main/updates.json"
 
 
-credits="Myself of course. Oh yeah, and Tablua for model making: https://www.curseforge.com/minecraft/mc-mods/tabula-minecraft-modeler"
+credits="Myself of course. Oh yeah, and Tablua for model making: https://www.curseforge.com/minecraft/mc-mods/tabula-minecraft-modeler. Also Mazzy: https://www.deviantart.com/mazdatiger Fumei:https://www.deviantart.com/moozdamilfshake Amari,Jane,TIFF:989onan Kodachi:Kodachi"
 authors="989onan"
 
 
 description='''
-This mod was made by 989onan#0794. This is my first mod, so it is garbage. 
-I made this as my many other garbage mods to satisfy my needs of making random crap involving cars.
+This mod was made by 989onan#0794. This is my first mod, but it is massively improving.
+I made this as my many other strange mods to satisfy my needs of making random crap involving cars.
 Enjoy?
 Also contact me on discord if you want the source code to try to make your own mod. It's also on the original mod page! :P
 

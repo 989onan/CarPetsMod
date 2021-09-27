@@ -1,0 +1,28 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        "W W",
+        "III",
+        "IAI"
+    ],
+    "key":
+    {
+        "W":
+        {
+            "item": "followingcarmod:wire"
+        },
+        "I":
+        {
+            "item": "minecraft:iron_nugget"
+        },
+        "A":{
+        	"item": "followingcarmod:acid"
+        }
+    },
+    "result":
+    {
+        "item": "followingcarmod:battery",
+        "count": 1
+    }
+}

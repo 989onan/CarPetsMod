@@ -1,0 +1,24 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "minecraft:spider_eye"
+		},
+		{
+			"item": "minecraft:water_bucket"
+		},
+		{
+			"item": "minecraft:rotten_flesh"
+		},
+		{
+			"item": "minecraft:nether_wart"
+		},
+		{
+			"item": "minecraft:blaze_powder"
+		}
+	],
+	"result": {
+		"item": "followingcarmod:acid",
+		"count": 1
+	}
+}

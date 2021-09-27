@@ -14,8 +14,8 @@
         {
           "type": "minecraft:item",
           "weight": 1,
-          "quality": 3,
-          "name": "minecraft:iron_block"
+          "quality": 1,
+          "name": "followingcarmod:alive_engine"
         }
       ]
     }

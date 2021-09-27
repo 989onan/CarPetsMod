@@ -57,28 +57,28 @@ public class DefaultModel extends GeneralPartModel{
     	
     	PartDefinition body = modelroot.addOrReplaceChild("Chassis1",CubeListBuilder.create().texOffs(0, 0)
     			//.addBox("DefaultModel",0.0F, 0.0F, 0.0F, 30, 1, 16,p_170769_,0,40) //don't remember what this is, but it breaks the model.
-    			.addBox("DefaultModel",-16.0F, 0.0F, -20.0F, 32, 1, 40,p_170769_,0,0)
-    			.addBox("DefaultModel",-16.0F, -13.0F, -40.0F, 32, 14, 20, p_170769_, 104, 0)
-    			.addBox("DefaultModel",-16.0F, -12.0F, 20.0F, 32, 13, 16, p_170769_, 128, 34)
-    			.addBox("DefaultModel",-16.0F, -12.0F, 20.0F, 32, 13, 16, p_170769_, 128, 34)
-    			.addBox("DefaultModel",15.0F, -13.0F, 20.0F, 1, 1, 16, p_170769_, 188, 0)
-    			.addBox("DefaultModel",-16.0F, -21.0F, -6.0F, 32, 1, 18, p_170769_, 0, 41)
-    			.addBox("DefaultModel",15.0F, -20.0F, 0.0F, 1, 20, 1, p_170769_, 34, 0)
-    			.addBox("DefaultModel",-16.0F, -20F, 0F, 1, 20, 1, p_170769_, 222, 0),
+    			.addBox("0",-16.0F, 0.0F, -20.0F, 32, 1, 40,p_170769_,0,0)
+    			.addBox("0",-16.0F, -13.0F, -40.0F, 32, 14, 20, p_170769_, 104, 0)
+    			.addBox("0",-16.0F, -12.0F, 20.0F, 32, 13, 16, p_170769_, 128, 34)
+    			.addBox("0",-16.0F, -12.0F, 20.0F, 32, 13, 16, p_170769_, 128, 34)
+    			.addBox("0",15.0F, -13.0F, 20.0F, 1, 1, 16, p_170769_, 188, 0)
+    			.addBox("0",-16.0F, -21.0F, -6.0F, 32, 1, 18, p_170769_, 0, 41)
+    			.addBox("0",15.0F, -20.0F, 0.0F, 1, 20, 1, p_170769_, 34, 0)
+    			.addBox("0",-16.0F, -20F, 0F, 1, 20, 1, p_170769_, 222, 0),
     			
     			PartPose.offset(0.0F, 18.0F, 0.0F));
     	
-        body.addOrReplaceChild("doorrr",CubeListBuilder.create().texOffs(99+64, 31+32).addBox("DefaultModel",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F),PartPose.offset(16.0F, 6.0F  -18.0F, 1.0F));
-        body.addOrReplaceChild("WindshieldModel",CubeListBuilder.create().texOffs(0, 45+32).addBox("DefaultModel",0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 17.0F),PartPose.offset(16.0F, -3.0F  -18.0F, -6.0F));
-        body.addOrReplaceChild("doorrl",CubeListBuilder.create().texOffs(141+64, 12+32).addBox("DefaultModel",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F),PartPose.offset(-15.0F, 6.0F  -18.0F, 1.0F));
-        body.addOrReplaceChild("Lid",CubeListBuilder.create().texOffs(0, 28+32).addBox("DefaultModel",0.0F, 0.0F, 0.0F, 30.0F, 1.0F, 16.0F),PartPose.offset(-15.0F, 5.0F  -18.0F, 20.0F));
-        body.addOrReplaceChild("WindowBack",CubeListBuilder.create().texOffs(28+64, 31+32).addBox("DefaultModel",0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 13.0F),PartPose.offset(-15.9F, -3.0F  -18.0F, 12.0F));
-        body.addOrReplaceChild("doorfl",CubeListBuilder.create().texOffs(144+64, 1).addBox("DefaultModel",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F),PartPose.offset(-15.0F, 6.0F  -18.0F, -20.0F));
-        body.addOrReplaceChild("doorfr",CubeListBuilder.create().texOffs(119+64, 43+32).addBox("DefaultModel",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F),PartPose.offset(16.0F, 6.0F  -18.0F, -20.0F));
-        modelroot.addOrReplaceChild("wheelfr1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("DefaultModel",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(16F, 18F, -30.0F));
-        modelroot.addOrReplaceChild("wheelrr1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("DefaultModel",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(16F, 18F, 28.0F));
-        modelroot.addOrReplaceChild("wheelfl1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("DefaultModel",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-17.5F, 18.0F, -30.0F));
-        modelroot.addOrReplaceChild("wheelrl1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("DefaultModel",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-17.5F, 18.0F, 28.0F));
+        body.addOrReplaceChild("doorrr",CubeListBuilder.create().texOffs(99+64, 31+32).addBox("0",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F),PartPose.offset(16.0F, 6.0F  -18.0F, 1.0F));
+        body.addOrReplaceChild("WindshieldModel",CubeListBuilder.create().texOffs(0, 45+32).addBox("0",0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 17.0F),PartPose.offset(16.0F, -3.0F  -18.0F, -6.0F));
+        body.addOrReplaceChild("doorrl",CubeListBuilder.create().texOffs(141+64, 12+32).addBox("0",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 19.0F),PartPose.offset(-15.0F, 6.0F  -18.0F, 1.0F));
+        body.addOrReplaceChild("Lid",CubeListBuilder.create().texOffs(0, 28+32).addBox("0",0.0F, 0.0F, 0.0F, 30.0F, 1.0F, 16.0F),PartPose.offset(-15.0F, 5.0F  -18.0F, 20.0F));
+        body.addOrReplaceChild("WindowBack",CubeListBuilder.create().texOffs(28+64, 31+32).addBox("0",0.0F, 0.0F, 0.0F, 32.0F, 1.0F, 13.0F),PartPose.offset(-15.9F, -3.0F  -18.0F, 12.0F));
+        body.addOrReplaceChild("doorfl",CubeListBuilder.create().texOffs(144+64, 1).addBox("0",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F),PartPose.offset(-15.0F, 6.0F  -18.0F, -20.0F));
+        body.addOrReplaceChild("doorfr",CubeListBuilder.create().texOffs(119+64, 43+32).addBox("0",-1.0F, -1.0F, 0.0F, 1.0F, 13.0F, 20.0F),PartPose.offset(16.0F, 6.0F  -18.0F, -20.0F));
+        modelroot.addOrReplaceChild("wheelfr1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("0",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(16F, 18F, -30.0F));
+        modelroot.addOrReplaceChild("wheelrr1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("0",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(16F, 18F, 28.0F));
+        modelroot.addOrReplaceChild("wheelfl1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("0",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-17.5F, 18.0F, -30.0F));
+        modelroot.addOrReplaceChild("wheelrl1",CubeListBuilder.create().texOffs(161+64, 44+32).addBox("0",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-17.5F, 18.0F, 28.0F));
         	//new ObjModel(CubeListBuilder.create()
         //iterate through everything and 
         

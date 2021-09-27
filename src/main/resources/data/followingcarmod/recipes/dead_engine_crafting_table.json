@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "followingcarmod:battery"
+		},
+		{
+			"item": "followingcarmod:piston_engine_block"
+		},
+		{
+			"item": "followingcarmod:wire"
+		},
+		{
+			"item": "followingcarmod:wire"
+		}
+	],
+	"result": {
+		"item": "followingcarmod:dead_engine",
+		"count": 1
+	}
+}

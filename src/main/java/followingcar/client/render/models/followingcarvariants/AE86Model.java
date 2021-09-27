@@ -56,30 +56,30 @@ public class AE86Model extends GeneralPartModel{
 		//AE86 MODEL
 		
 		PartDefinition body = modelroot.addOrReplaceChild("Chassis2",CubeListBuilder.create().texOffs(0, 0)
-				.addBox("ae86",-13.9F, -0.7F, -17.5F, 27, 1, 23,p_170769_,104, 0)
-				.addBox("ae86",12.9F, -19.0F, 5.0F, 1, 8, 1,p_170769_,104, 0)
-				.addBox("ae86",-14.0F, -11.7F, -31.0F, 28, 12, 14,p_170769_,0, 24)
-				.addBox("ae86",-14.0F, -11.7F, 5.0F, 28, 12, 13,p_170769_,84, 24)
-				.addBox("ae86",-13.9F, -19.0F, 5.0F, 1, 8, 1, p_170769_,4, 0)
+				.addBox("1",-13.9F, -0.7F, -17.5F, 27, 1, 23,p_170769_,104, 0)
+				.addBox("1",12.9F, -19.0F, 5.0F, 1, 8, 1,p_170769_,104, 0)
+				.addBox("1",-14.0F, -11.7F, -31.0F, 28, 12, 14,p_170769_,0, 24)
+				.addBox("1",-14.0F, -11.7F, 5.0F, 28, 12, 13,p_170769_,84, 24)
+				.addBox("1",-13.9F, -19.0F, 5.0F, 1, 8, 1, p_170769_,4, 0)
 				,PartPose.offset(0.0F, 18.0F, 4.0F));
-		body.addOrReplaceChild("WindshieldModel",CubeListBuilder.create().texOffs(64+8, 32+17).addBox("ae86",-14.0F, -1.0F, 0.0F, 28.0F, 1.0F, 12.0F),PartPose.offset(0.0F, -20.0F, -10.0F));
-		body.addOrReplaceChild("WindowBack",CubeListBuilder.create().texOffs(64+102, 24).addBox("ae86",-14.0F, 0.0F, 0.0F, 28.0F, 1.0F, 15.0F),PartPose.offset(0.0F, -20.0F, 5.0F));
+		body.addOrReplaceChild("WindshieldModel",CubeListBuilder.create().texOffs(64+8, 32+17).addBox("1",-14.0F, -1.0F, 0.0F, 28.0F, 1.0F, 12.0F),PartPose.offset(0.0F, -20.0F, -10.0F));
+		body.addOrReplaceChild("WindowBack",CubeListBuilder.create().texOffs(64+102, 24).addBox("1",-14.0F, 0.0F, 0.0F, 28.0F, 1.0F, 15.0F),PartPose.offset(0.0F, -20.0F, 5.0F));
 		
-		body.addOrReplaceChild("roof",CubeListBuilder.create().texOffs(0, 32+18).addBox("ae86",-14.0F, 0.0F, 0.0F, 28.0F, 1.0F, 15.0F),PartPose.offset(0.0F, -20.0F, -10.0F));
+		body.addOrReplaceChild("roof",CubeListBuilder.create().texOffs(0, 32+18).addBox("1",-14.0F, 0.0F, 0.0F, 28.0F, 1.0F, 15.0F),PartPose.offset(0.0F, -20.0F, -10.0F));
 		
 		
-		modelroot.addOrReplaceChild("wheelfl2",CubeListBuilder.create().texOffs(231, 215).addBox("ae86",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-15.1F, 18.0F, -20.0F));
-		modelroot.addOrReplaceChild("wheelfr2",CubeListBuilder.create().texOffs(231, 215).addBox("ae86",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(13.1F, 18.0F, -20.0F));
+		modelroot.addOrReplaceChild("wheelfl2",CubeListBuilder.create().texOffs(231, 215).addBox("1",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-15.1F, 18.0F, -20.0F));
+		modelroot.addOrReplaceChild("wheelfr2",CubeListBuilder.create().texOffs(231, 215).addBox("1",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(13.1F, 18.0F, -20.0F));
 		
-		modelroot.addOrReplaceChild("wheelrl2",CubeListBuilder.create().texOffs(231, 215).addBox("ae86",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-15.1F, 18.0F, 14.0F));
-		modelroot.addOrReplaceChild("wheelrr2",CubeListBuilder.create().texOffs(231, 215).addBox("ae86",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(13.1F, 18.0F, 14.0F));
+		modelroot.addOrReplaceChild("wheelrl2",CubeListBuilder.create().texOffs(231, 215).addBox("1",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(-15.1F, 18.0F, 14.0F));
+		modelroot.addOrReplaceChild("wheelrr2",CubeListBuilder.create().texOffs(231, 215).addBox("1",-0.0F, -6.0F, -6.0F, 1.0F, 12.0F, 12.0F),PartPose.offset(13.1F, 18.0F, 14.0F));
 		
-		body.addOrReplaceChild("doorfr",CubeListBuilder.create().texOffs(64+127, 32+8).addBox("ae86",-1.0F, 0.0F, 0.0F, 1.0F, 11.0F, 23.0F),PartPose.offset(13.9F, -11.6F, -17.5F));
-		body.addOrReplaceChild("doorfl",CubeListBuilder.create().texOffs(64+79, 32+8).addBox("ae86",0.0F, 0.0F, 0.0F, 1.0F, 11.2F, 22.5F),PartPose.offset(-14.0F, -11.7F, -17.5F));
+		body.addOrReplaceChild("doorfr",CubeListBuilder.create().texOffs(64+127, 32+8).addBox("1",-1.0F, 0.0F, 0.0F, 1.0F, 11.0F, 23.0F),PartPose.offset(13.9F, -11.6F, -17.5F));
+		body.addOrReplaceChild("doorfl",CubeListBuilder.create().texOffs(64+79, 32+8).addBox("1",0.0F, 0.0F, 0.0F, 1.0F, 11.2F, 22.5F),PartPose.offset(-14.0F, -11.7F, -17.5F));
 	   
 		
-	    body.addOrReplaceChild("HeadlightL", CubeListBuilder.create().texOffs(0, 66).addBox("ae86",-3.5F, 0.0F, -8.5F, 5.9F, 5.0F, 9.0F),PartPose.offset(8.0F, -12.0F, -20.0F));
-	    body.addOrReplaceChild("HeadlightR", CubeListBuilder.create().texOffs(0, 66).addBox("ae86",-3.5F, 0.0F, -8.5F, 5.9F, 5.0F, 9.0F),PartPose.offset(-8.0F, -12.0F, -20.0F));
+	    body.addOrReplaceChild("HeadlightL", CubeListBuilder.create().texOffs(0, 66).addBox("1",-3.5F, 0.0F, -8.5F, 5.9F, 5.0F, 9.0F),PartPose.offset(8.0F, -12.0F, -20.0F));
+	    body.addOrReplaceChild("HeadlightR", CubeListBuilder.create().texOffs(0, 66).addBox("1",-3.5F, 0.0F, -8.5F, 5.9F, 5.0F, 9.0F),PartPose.offset(-8.0F, -12.0F, -20.0F));
 		//This allows the creation of a bunch of seats in an array and then render them all at once.
 	    //Better than instantiating 20 variables and then listing them in the renderer.
 	    //This code was written in preparation for making a bus renderer class in less code.

@@ -21,7 +21,7 @@ public class EntityTypeInit {
 	
 	//register our Entities
 	@SuppressWarnings("unchecked")
-	public static final EntityType<FollowingCar> FOLLOWING_CAR = (EntityType<FollowingCar>) EntityType.Builder.of(FollowingCar::new,MobCategory.CREATURE).build(MainFollowingCar.MODID+":following_car").setRegistryName(new ResourceLocation(MainFollowingCar.MODID, "following_car"));
+	public static final EntityType<FollowingCar> FOLLOWING_CAR = (EntityType<FollowingCar>) EntityType.Builder.of(FollowingCar::new,MobCategory.CREATURE).sized(1.4F, 2F).build(MainFollowingCar.MODID+":following_car").setRegistryName(new ResourceLocation(MainFollowingCar.MODID, "following_car"));
 	
 	
 	

@@ -20,14 +20,6 @@ build
 # other
 eclipse
 run
-setup
-build
 
 # Files from Forge MDK
 forge*changelog.txt
-build.bat
-LICENSE.txt
-logs/latest.log
-myoutput.txt
-setup.bat
-updates.json

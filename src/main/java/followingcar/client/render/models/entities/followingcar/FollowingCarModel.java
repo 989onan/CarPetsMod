@@ -1,15 +1,12 @@
 package followingcar.client.render.models.entities.followingcar;
 
 import java.util.HashMap;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import followingcar.client.render.models.followingcarvariants.AE86Model;
 import followingcar.client.render.models.followingcarvariants.DefaultModel;
 import followingcar.client.render.models.followingcarvariants.GeneralPartModel;
 import followingcar.common.entities.FollowingCar;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -18,7 +15,6 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import followingcar.client.render.entities.followingcar.*;
 import followingcar.core.init.*;
 
 /**
@@ -83,26 +79,34 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
     
     private void PrepModel(T entityIn, float limbSwing) {
     	
-    	//hide all models and their parts, then unhide what model the car is set to.
+    	//hide all models and their parts, then unhide what model the car is set to later.
 		AllModelPartModels.forEach((k,Model)-> {Model.forEach((j,Part) -> {Part.visible = false;});});
 		
-		//if it has an easter egg name, render that model. Else use the car model type it is set to.
-		String name = ChatFormatting.stripFormatting(entityIn.getName().getString());
+		//the code craziness below says this:
+		/*
+		1. grab the actual car type. Name overrides car type
+		2. if both block model and obj model types are null, then render default block model
+		3. if obj model doesn't equal null, obj model gets priority so render nothing
+		4. if we have a block model, render it
+		4. if somehow we got past everything else, render default
+		*/
 		
-		if(AllModelPartModels.get(entityIn.getCarType()) == null && FollowingCarRender.NameToVariant.get(name) == null && CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null){
+		int actualtype = entityIn.getActualCarType();
+		
+		
+		if(AllModelPartModels.get(actualtype) == null && CarBlockTypesMaster.CarObjModels.get(actualtype) == null){
 			AllModelPartModels.get(0).forEach((k,Part) -> {Part.visible = true;});
 		}
-		else if(FollowingCarRender.NameToVariant.get(name) != null){
-			if(CarBlockTypesMaster.CarObjModels.get(FollowingCarRender.NameToVariant.get(name)) != null) {
-				//we don't run anything here, since the model layer will take care of this!
-				//this check is to prevent a block model being drawn if a .obj exists when it has a registered variant name.
-			}
-			else if(AllModelPartModels.get(FollowingCarRender.NameToVariant.get(name)) != null) {
-				AllModelPartModels.get(FollowingCarRender.NameToVariant.get(name)).forEach((k,Part) -> {Part.visible = true;});
-			}
+		else if(CarBlockTypesMaster.CarObjModels.get(actualtype) != null) {
+			//we don't run anything here, since the model layer will take care of this!
+			//this check is to prevent a block model being drawn if a .obj exists when it has a registered variant name.
 		}
-		else if (CarBlockTypesMaster.CarObjModels.get(entityIn.getCarType()) == null && CarBlockTypesMaster.CarObjModels.get(FollowingCarRender.NameToVariant.get(name)) == null){
-			AllModelPartModels.get(entityIn.getCarType()).forEach((k,Part) -> {Part.visible = true;});
+		else if (AllModelPartModels.get(actualtype) != null){
+			AllModelPartModels.get(actualtype).forEach((k,Part) -> {Part.visible = true;});
+		}
+		else {
+			
+			AllModelPartModels.get(0).forEach((k,Part) -> {Part.visible = true;});
 		}
 		
 		
@@ -149,7 +153,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    		while (foundwheel) {
 	    			i++;
 	    			if(Model.get("wheel-l"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, 0.0f, 0.0f);
+	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, entityIn.rotationsign*30, 0.0f);
 	    			}
 	    			else {
 	    				foundwheel = false;
@@ -161,7 +165,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    			i++;
 	    			
 	    			if(Model.get("wheel-r"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, 0.0f, 0.0f);
+	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, entityIn.rotationsign*30, 0.0f);
 	    			}
 	    			else {
 	    				foundwheel = false;
