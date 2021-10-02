@@ -155,7 +155,7 @@ public class CarTypeRegistry {
 					.setMaxSpeed(146F)//in miles per hour
 					.setPassengerOffsets(//in order from driver to first passenger to last passenger
 							new Vec3[] {//this also determines the max passengers.
-									new Vec3(-0.490111,-0.642195,1.22653),new Vec3(0.490111,-0.642195,1.22653)
+									new Vec3(-0.490111,-0.642195,0.22653),new Vec3(0.490111,-0.642195,0.22653)
 								}
 							
 							)
@@ -196,7 +196,6 @@ public class CarTypeRegistry {
 					})
 					.setName("Mclaren Senna")
 				);
-			
 			
 			//Chevy Tahoe 2007
 			put(7,
@@ -331,6 +330,30 @@ public class CarTypeRegistry {
 					})
 					.setName("Ferrari F50")
 				);
+			put(12,
+					new CarType("mazda_rx7_fd_body","mazda_rx7_fd_color","mazda_rx7_fd_wheel","high",//obj models
+							null,null)//block model
+					.setAcceleration((60-0)/ /*X Seconds:*/ 4.9F) //0-60mph in X seconds.
+					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
+					.setDriftMultiplier(3.5F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
+					.setMaxSpeed(160F)//in miles per hour
+					.setPassengerOffsets(//in order from driver to first passenger to last passenger
+							new Vec3[] {//this also determines the max passengers.
+									new Vec3(-0.331877,-0.257305,0.450663),new Vec3(0.331877,-0.257305,0.450663)
+								}
+							
+							)
+					.setWheelOffsets(new HashMap<String,Vec3>(){private static final long serialVersionUID = -6323696599663271312L;
+						{
+							//this is where the model values go
+							//all values are in degrees and meters in the Blender3D editor
+							put("WheelLRot",new Vec3(0F,0F,0F)); //wheel default rotation
+							put("WheelL_1_Offset",new Vec3(-0.785292,0.314245,1.18841)); //position of the first wheel (usually front) on the left looking at the car from the back
+							put("WheelL_2_Offset",new Vec3(-0.785292,0.314245,-1.17647)); //same as above but for second on same side
+						}
+					})
+					.setName("Mazda RX7 FD")
+				);
 		}//types stop here.
 	}; 
 	
@@ -382,6 +405,7 @@ public class CarTypeRegistry {
 			put("Mazzy",4);
 			put("TIFF",8);
 			put("TIOS",9);
+			put("Keisuke",12);
 		}
 	};
 	

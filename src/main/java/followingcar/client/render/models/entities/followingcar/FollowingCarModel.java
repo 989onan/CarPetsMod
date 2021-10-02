@@ -13,6 +13,7 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import followingcar.core.init.*;
@@ -109,7 +110,15 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 			AllModelPartModels.get(0).forEach((k,Part) -> {Part.visible = true;});
 		}
 		
-		
+		//getting synced data set num 1 from entity
+ 	     String incomingstatus1 = Integer.toBinaryString(entityIn.getEntityData().get(FollowingCar.CarFlags1).byteValue());
+ 	     
+ 	     incomingstatus1 = ("0".repeat(Math.abs(incomingstatus1.length()-4)))+incomingstatus1;
+ 	     
+ 	     
+ 	     short rotationsign = (short) -(incomingstatus1.charAt(0) == '0' ? Short.parseShort(""+incomingstatus1.charAt(1)) : -1*Short.parseShort(""+incomingstatus1.charAt(1)));
+        short movementsign = (short) -(incomingstatus1.charAt(2) == '0' ? Short.parseShort(""+incomingstatus1.charAt(3)) : -1*Short.parseShort(""+incomingstatus1.charAt(3)));
+        
 		
 		//Below this line is rotations. Above this line is car type parameters 
 		
@@ -124,7 +133,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    		while (foundwheel) {
 	    			i++;
 	    			if(Model.get("wheel-l"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, 0.0f, 0.6f);
+	    				this.setRotateAngle(Model.get("wheel-l"+i), (( limbSwing/1.1F)*movementsign), 0.0f, 0.6f);
 	    			}
 	    			else {
 	    				foundwheel = false;
@@ -135,7 +144,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    		while (foundwheel) {
 	    			i++;
 	    			if(Model.get("wheel-r"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, 0.0f, -0.6f);
+	    				this.setRotateAngle(Model.get("wheel-r"+i), (( limbSwing/1.1F)*movementsign), 0.0f, -0.6f);
 	    			}
 	    			else {
 	    				foundwheel = false;
@@ -153,7 +162,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    		while (foundwheel) {
 	    			i++;
 	    			if(Model.get("wheel-l"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-l"+i), limbSwing/1.1F, entityIn.rotationsign*30, 0.0f);
+	    				this.setRotateAngle(Model.get("wheel-l"+i), (( limbSwing/1.1F)*movementsign), (rotationsign*CarTypeRegistry.WheelAngle*Mth.DEG_TO_RAD), 0.0f);
 	    			}
 	    			else {
 	    				foundwheel = false;
@@ -165,7 +174,7 @@ public class FollowingCarModel<T extends FollowingCar> extends EntityModel<T> {
 	    			i++;
 	    			
 	    			if(Model.get("wheel-r"+i) != null){
-	    				this.setRotateAngle(Model.get("wheel-r"+i), limbSwing/1.1F, entityIn.rotationsign*30, 0.0f);
+	    				this.setRotateAngle(Model.get("wheel-r"+i), (( limbSwing/1.1F)*movementsign), (rotationsign*CarTypeRegistry.WheelAngle*Mth.DEG_TO_RAD), 0.0f);
 	    			}
 	    			else {
 	    				foundwheel = false;

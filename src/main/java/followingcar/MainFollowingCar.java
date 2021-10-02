@@ -2,14 +2,9 @@ package followingcar;
 
 
 import java.util.ArrayList;
-
-
-
 import java.util.function.Function;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import followingcar.common.entities.FollowingCar;
 import followingcar.config.FollowingCarConfig;
 import followingcar.core.init.EntityTypeInit;
@@ -24,6 +19,7 @@ import net.minecraft.Util;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -33,6 +29,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 
 /*
@@ -40,7 +37,10 @@ import net.minecraft.util.Mth;
 	1. change the build.gradle file to reflect version number
 	2. check mods.toml to make sure it reflects the mod info.
 	
-	
+	DO THESE AFTER UPLOADING
+	1. change updates.json on github to match
+	2. upload src to github using github desktop
+	3. update carpetmodextras updates.json as well if applicable 
 */
 
 
@@ -98,7 +98,11 @@ public class MainFollowingCar {
         //else they are not in FollowingCar and taking suffocation damage don't change the damage.
     	
     }
+    public static final SoundEvent CAR_PURR = new SoundEvent(MainFollowingCar.Location("car_purr")).setRegistryName(MainFollowingCar.Location("car_purr"));
     
+    public static final SoundEvent CAR_REV = new SoundEvent(MainFollowingCar.Location("car_rev")).setRegistryName(MainFollowingCar.Location("car_rev"));
+
+	public static final SoundEvent CAR_HURT = new SoundEvent(MainFollowingCar.Location("car_hurt")).setRegistryName(MainFollowingCar.Location("car_hurt"));
     
     @SubscribeEvent
     public void onDeath(LivingDeathEvent event) {
@@ -161,8 +165,6 @@ public class MainFollowingCar {
     	
     }
     
-    
-    
     @SuppressWarnings("unchecked")
 	private <T extends Entity> T changeDimension(T entity,ServerLevel dim) {
     	return (T) entity.changeDimension(dim, new ITeleporter()
@@ -178,6 +180,18 @@ public class MainFollowingCar {
         });
 	}
 
+    
+    @SubscribeEvent
+	public static void RegisterSound(final RegistryEvent.Register<SoundEvent> event) {
+		event.getRegistry().registerAll(
+				MainFollowingCar.CAR_REV,
+				MainFollowingCar.CAR_PURR,
+				MainFollowingCar.CAR_HURT
+				);
+		
+		
+	}
+    
 	public static ResourceLocation Location(String name) {
     	return new ResourceLocation(MODID,name);
     }

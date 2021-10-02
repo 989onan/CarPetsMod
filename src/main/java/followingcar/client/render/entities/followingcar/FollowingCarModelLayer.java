@@ -87,6 +87,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
         if (!entityIn.isInvisible() || flag){
         	BlockRenderDispatcher blockrenderdispatcher = minecraft.getBlockRenderer();
         	
+        	
         	//get a caught and sanitized car type so we won't get an error when doing anything with
         	//this car type.
         	int actualtype = entityIn.getActualCarType();
@@ -192,6 +193,18 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
         			 float[] afloat = new float[]{(float)h / 255.0F, (float)j / 255.0F, (float)k / 255.0F};
         			 
 		             Vec3 offset = new Vec3(0F,1.5,0F);
+		             
+		             
+		             //getting synced data set num 1 from entity
+			  	     String incomingstatus1 = Integer.toBinaryString(entityIn.getEntityData().get(FollowingCar.CarFlags1).byteValue());
+			  	     
+			  	     incomingstatus1 = ("0".repeat(Math.abs(incomingstatus1.length()-4)))+incomingstatus1;
+			  	     
+			  	     
+			  	     short rotationsign = (short) -(incomingstatus1.charAt(0) == '0' ? Short.parseShort(""+incomingstatus1.charAt(1)) : -1*Short.parseShort(""+incomingstatus1.charAt(1)));
+		             short movementsign = (short) -(incomingstatus1.charAt(2) == '0' ? Short.parseShort(""+incomingstatus1.charAt(3)) : -1*Short.parseShort(""+incomingstatus1.charAt(3)));
+		             //MainFollowingCar.LOGGER.info(incomingstatus1);
+		             
 		             //try to render the car chassis model with given offsets.
 		             try {
 		            	 poseStack.pushPose();
@@ -260,7 +273,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 								poseStack.translate(scalelist.get("WheelL_"+i+"_Offset").x*scale.x, -scalelist.get("WheelL_"+i+"_Offset").y*scale.y, scalelist.get("WheelL_"+i+"_Offset").z*scale.z);
 								
 								if(i==1) {//car turn
-									 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*CarTypeRegistry.WheelAngle)));
+									 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(rotationsign*CarTypeRegistry.WheelAngle)));
 								 }
 								
 								
@@ -268,7 +281,9 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 									poseStack.mulPose(Vector3f.ZN.rotationDegrees(Mth.RAD_TO_DEG*( 6.0F)));
 								}
 								
-								poseStack.mulPose(Vector3f.XN.rotationDegrees(Mth.RAD_TO_DEG*( LimbSwing/1.1F)));
+								poseStack.mulPose(Vector3f.XN.rotationDegrees(Mth.RAD_TO_DEG*( LimbSwing/1.1F)*movementsign));
+								
+								//MainFollowingCar.LOGGER.info(entityIn.movementsign);
 								
 								//p_117349_.translate(0F,0.0F,0F);
 								poseStack.scale((float)scale.x, (float)scale.x, (float)scale.x);
@@ -289,7 +304,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 							 poseStack.translate(-scalelist.get("WheelL_"+i+"_Offset").x*scale.x, -scalelist.get("WheelL_"+i+"_Offset").y*scale.y, scalelist.get("WheelL_"+i+"_Offset").z*scale.z);///scalelist.get("LongestChassisAxis").x);
 							
 							 if(i==1) {//car turn
-								 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(entityIn.rotationsign*CarTypeRegistry.WheelAngle)));
+								 poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(rotationsign*CarTypeRegistry.WheelAngle)));
 							 }
 				             poseStack.mulPose(Vector3f.YN.rotationDegrees(180.0F));
 				             
@@ -297,7 +312,7 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 				            	 poseStack.mulPose(Vector3f.ZN.rotationDegrees(Mth.RAD_TO_DEG*(6.0F)));
 				             }
 				             
-				             poseStack.mulPose(Vector3f.XN.rotationDegrees(-Mth.RAD_TO_DEG*( LimbSwing/1.1F)));
+				             poseStack.mulPose(Vector3f.XN.rotationDegrees(-Mth.RAD_TO_DEG*( LimbSwing/1.1F)*movementsign));
 				             //Model.get("wheel-r"+i).get("scale")
 				             
 				             
