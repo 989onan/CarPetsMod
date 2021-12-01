@@ -57,6 +57,7 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.DyeItem;
 
+
 public class FollowingCar extends TamableAnimal implements PlayerRideable{
 	protected static final Ingredient TAMING_ITEMS = Ingredient.of(itemsmaster.GASCAN);
 	protected static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(FollowingCar.class, EntityDataSerializers.INT);
@@ -316,7 +317,6 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 		this.getPassengers().forEach((hello)->{
 			hello.setYRot(hello.getYRot() + this.deltarotation);
 			hello.setYHeadRot(hello.getYHeadRot() + this.deltarotation);
-			LOGGER.info(this.deltarotation);
 			this.clampRotation(hello);
 		});
 		updatePassengerPos(passenger);
@@ -398,11 +398,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 			this.maxUpStep = 1.1F;
 			LivingEntity livingentity = (LivingEntity)this.getPassengers().get(this.getPassengers().size()-1);//make the last passenger the controlling one, but since the display of the passenger...
 			//positions is shifted, the person that is visually the first is the one controlling.
-
-
-
-
-
+			
 			short rotationsignL = 0;
 
 			if(livingentity != null) {
@@ -619,7 +615,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 					double d6 = d3 - d10;
 					float f2 = (float)(d6 * 10.0D - 3.0D);
 					if (f2 > 0.0F) {
-						this.playSound(this.getFallDamageSound((int)f2), 1.0F, 1.0F);
+						this.playSound(this.getFallSounds().small(), 1.0F, 1.0F);
 						this.hurt(DamageSource.FLY_INTO_WALL, f2);
 					}
 				}
@@ -679,7 +675,7 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 				else {
 
 					//first we calculate the dot from the front to get how close the movement direction is from the front. if it is 1 it is going perfectly forward. We multiply by this to get sideways resistance
-					float sidewaysfactor = (float) Math.abs(this.getDeltaMovement().normalize().dot(this.getForward().normalize()));
+					float sidewaysfactor = (float) Math.abs(this.getDeltaMovement().dot(this.getForward()));
 					//next we multiply sideways by the roll friction multiplier. The higher the roll friction multiplier the slippier it is. We also multiply by drift factor and then clamp it to get more powerful drifting. Then we multiply by original friction
 					//to get the modified friction. We then make the slipperyness 100% (aka 1) if the car is off the ground. 
 					f4 = this.onGround ?  Mth.clamp(f4*CarTypeRegistry.CarTypes.get(this.getActualCarType()).getRollFrictionMultiplier()*Mth.clamp(sidewaysfactor*CarTypeRegistry.CarTypes.get(this.getActualCarType()).getDriftMultiplier(),0F,.98F),0F,.98F) : 1F;
@@ -775,6 +771,9 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 		}
 	}
 
+	 public SoundEvent getFallDamageSound(int p_21313_) {
+	      return p_21313_ > 4 ? this.getFallSounds().big() : this.getFallSounds().small();
+	   }
 
 
 	//end controlling car block

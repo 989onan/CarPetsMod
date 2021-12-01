@@ -1,5 +1,5 @@
 modLoader="javafml" 
-loaderVersion="[35,)" 
+loaderVersion="[38,)" 
 license="MIT License"
 
 issueTrackerURL="https://github.com/989onan/CarPetsMod/issues"
@@ -35,12 +35,12 @@ https://www.curseforge.com/minecraft/mc-mods/car-pets
 [[dependencies.followingcarmod]]
     modId="forge"
     mandatory=true
-    versionRange="[37,)"
+    versionRange="[38,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.followingcarmod]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17,1.18)"
+    versionRange="[1.18,1.19)"
     ordering="NONE"
     side="BOTH"

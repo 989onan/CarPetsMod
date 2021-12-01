@@ -2,10 +2,12 @@ package followingcar;
 
 
 import java.util.ArrayList;
+
 import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import followingcar.common.entities.FollowingCar;
+import followingcar.config.ConfigPacket;
 import followingcar.config.FollowingCarConfig;
 import followingcar.core.init.EntityTypeInit;
 import net.minecraft.world.entity.Entity;
@@ -17,16 +19,20 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -50,6 +56,8 @@ import net.minecraft.util.Mth;
 public class MainFollowingCar {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "followingcarmod";
+    
+    public static int disc = 0;
     
     
     //easter egg names ^_^
@@ -78,12 +86,19 @@ public class MainFollowingCar {
     public MainFollowingCar() {
     	
     	
+    	//ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "ANY", (remote, isServer) -> true));
     	
     	
     	FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
     	FollowingCarConfig.loadConfig(FollowingCarConfig.config, FMLPaths.CONFIGDIR.get().resolve("car-pets-config.toml").toString());
+    	if (FMLEnvironment.dist != Dist.CLIENT) {
+    		//sending server config to client
+    		 FollowingCarConfig.userealsize.get();
+		}
     	//EntityTypeInit.ENTITIES.register(bus); <-- Doesn't work
         MinecraftForge.EVENT_BUS.register(this);
+        ConfigPacket.register();
+        
     }
     
     //this prevents the player from suffocating in a wall while riding the car pet.
@@ -98,6 +113,14 @@ public class MainFollowingCar {
         //else they are not in FollowingCar and taking suffocation damage don't change the damage.
     	
     }
+    
+    @SubscribeEvent
+    public void playerJoin(final PlayerLoggedInEvent event) {
+    	MainFollowingCar.LOGGER.info("Player Connected!");
+    	ConfigPacket.INSTANCE.sendTo(new ConfigPacket.MyPacket(FollowingCarConfig.userealsize.get()), ((ServerPlayer)event.getPlayer()).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+    }
+    
+    
     public static final SoundEvent CAR_PURR = new SoundEvent(MainFollowingCar.Location("car_purr")).setRegistryName(MainFollowingCar.Location("car_purr"));
     
     public static final SoundEvent CAR_REV = new SoundEvent(MainFollowingCar.Location("car_rev")).setRegistryName(MainFollowingCar.Location("car_rev"));

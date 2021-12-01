@@ -17,8 +17,10 @@ public class CarType {
 	private String MainTextureName;
 	private float DriftMultiplier;
 	private String Name;
+	private String TextureAtlasName;
 	
-	public CarType(String BodyModelName, String ColorModelName, String WheelModelName, String HighDefIdentifier, String MainColorModelTextureName, String MainBlockModelTextureName) {
+	public CarType(String BodyModelName, String ColorModelName, String WheelModelName, String HighDefIdentifier, 
+			String MainColorModelTextureName, String MainBlockModelTextureName,String TextureAtlasName) {
 		this.MaxSpeed = 1;
 		this.FrictionMultiplier = 1;
 		this.Acceleration = 1;
@@ -56,6 +58,7 @@ public class CarType {
 		this.MainTextureName = MainBlockModelTextureName;
 		this.ColorTextureName = MainColorModelTextureName;
 		this.Name = "NULL";
+		this.TextureAtlasName = TextureAtlasName;
 	}
 	
 	
@@ -82,6 +85,11 @@ public class CarType {
 	public HashMap<Integer, String> getModelNames() {return ModelNames;}
 	public CarType setName(String name) {this.Name = name;return this;}
 	public String getName() {return this.Name;}
+
+
+	public String getTextureAtlas() {
+		return this.TextureAtlasName;
+	}
 	
 	
 	

@@ -5,6 +5,7 @@ import followingcar.client.render.FollowingCarRenderRegistry;
 import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.common.entities.FollowingCar;
 import followingcar.common.util.CarType;
+import followingcar.core.init.CarBlockTypesMaster;
 import followingcar.core.init.CarTypeRegistry;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -26,6 +27,9 @@ public class FollowingCarRender extends MobRenderer<FollowingCar, FollowingCarMo
 		
 		//grab this entity type's true car type
 		CarType car = CarTypeRegistry.CarTypes.get(entity.getActualCarType());
+		if(CarBlockTypesMaster.CarObjModels.get(entity.getActualCarType()).size() > 0) {
+			return MainFollowingCar.ExtrasLocation(car.getTextureAtlas());
+		}
 		
 		//if this car type's texture isn't null, return it
 		if(car.getMainTextureName() != null) {

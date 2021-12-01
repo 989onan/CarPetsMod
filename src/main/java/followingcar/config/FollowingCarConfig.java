@@ -32,11 +32,12 @@ public class FollowingCarConfig {
 	}
 	//initializing variables that will have the values in the config file
 	public static ForgeConfigSpec.BooleanValue oldmovement;
-	public static ForgeConfigSpec.BooleanValue realturning;
+	public static ForgeConfigSpec.BooleanValue userealsize;
 	//loading values into variables
 	public static void init(ForgeConfigSpec.Builder serverconfig) {
 		serverconfig.comment("Car Pets Config");
 		
 		oldmovement = serverconfig.comment("Whether or not to use the old movement system").define("followingcarconfig.oldmovement", false);
+		userealsize = serverconfig.comment("Whether or not to use realistic size. This will not look right if only done on the client config! Cars are usually 1.5X this changes it to 1X.").define("followingcarconfig.userealsize", false);
 	}
 }
