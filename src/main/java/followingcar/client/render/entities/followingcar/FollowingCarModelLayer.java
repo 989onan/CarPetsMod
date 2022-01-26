@@ -1,17 +1,19 @@
 package followingcar.client.render.entities.followingcar;
 
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Random;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
+
 import followingcar.MainFollowingCar;
 import followingcar.client.render.models.entities.followingcar.FollowingCarModel;
 import followingcar.common.entities.FollowingCar;
 import followingcar.core.init.CarBlockTypesMaster;
 import followingcar.core.init.CarTypeRegistry;
+
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -217,7 +219,12 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 								//MainFollowingCar.LOGGER.info(entityIn.movementsign);
 
 								//p_117349_.translate(0F,0.0F,0F);
-								poseStack.scale((float)scale.x, (float)scale.x, (float)scale.x);
+								if(i==2 && actualtype==13) {
+									poseStack.scale((float)(scale.x*1.45156), (float)scale.x, (float)scale.x);
+								}
+								else {
+									poseStack.scale((float)scale.x, (float)scale.x, (float)scale.x);
+								}
 
 								FollowingCarModelLayer.renderBlockOnEntity(poseStack, p_117350_, p_117351_, flag, blockrenderdispatcher, null, coords, wheelbakedmodel, lightlevelColors,false,atlastexture);
 								poseStack.popPose();
@@ -238,7 +245,8 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 									poseStack.mulPose(Vector3f.YN.rotationDegrees(0F+(rotationsign*CarTypeRegistry.WheelAngle)));
 								}
 								poseStack.mulPose(Vector3f.YN.rotationDegrees(180.0F));
-
+								
+								
 								if(entityIn.isOrderedToSit() || entityIn.isInSittingPose()) {
 									poseStack.mulPose(Vector3f.ZN.rotationDegrees(Mth.RAD_TO_DEG*(6.0F)));
 								}
@@ -249,8 +257,12 @@ public class FollowingCarModelLayer extends RenderLayer<FollowingCar,FollowingCa
 
 
 
-								poseStack.scale((float)scale.x, (float)scale.y, (float)scale.z);
-
+								if(i==2 && actualtype==13) {
+									poseStack.scale((float)(scale.x*1.45156), (float)scale.x, (float)scale.x);
+								}
+								else {
+									poseStack.scale((float)scale.x, (float)scale.x, (float)scale.x);
+								}
 								//uncomment this after test
 
 

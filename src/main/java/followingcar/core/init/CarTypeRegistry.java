@@ -350,10 +350,34 @@ public class CarTypeRegistry {
 							//all values are in degrees and meters in the Blender3D editor
 							put("WheelLRot",new Vec3(0F,0F,0F)); //wheel default rotation
 							put("WheelL_1_Offset",new Vec3(-0.785292,0.314245,1.18841)); //position of the first wheel (usually front) on the left looking at the car from the back
-							put("WheelL_2_Offset",new Vec3(-0.785292,0.314245,-1.17647)); //same as above but for second on same side
+							put("WheelL_2_Offset",new Vec3(-0.785292,0.314245,-3.36979)); //same as above but for second on same side
 						}
 					})
 					.setName("Mazda RX7 FD")
+				);
+			put(13,
+					new CarType("gta_truck_body","gta_truck_color","gta_truck_wheel","high",//obj models
+							null,null,"textures/blocks/cartypes/palletfull.png")//block model
+					.setAcceleration((60-0)/ /*X Seconds:*/ 10F) //0-60mph in X seconds.
+					.setRollFrictionMultiplier(2.5F) // 1 - infinity slipperiness. decimal = constantly braking
+					.setDriftMultiplier(4F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
+					.setMaxSpeed(220F)//in miles per hour
+					.setPassengerOffsets(//in order from driver to first passenger to last passenger
+							new Vec3[] {//this also determines the max passengers.
+									new Vec3(0F,-2.15661F,2.05754F), new Vec3(0F,-4.27734F,2.05754F)
+								}
+							
+							)
+					.setWheelOffsets(new HashMap<String,Vec3>(){private static final long serialVersionUID = -6323696599663271312L;
+						{
+							//this is where the model values go
+							//all values are in degrees and meters in the Blender3D editor
+							put("WheelLRot",new Vec3(0F,0F,0F)); //wheel default rotation
+							put("WheelL_1_Offset",new Vec3(-2.1838,0.873633,3.57503)); //position of the first wheel (usually front) on the left looking at the car from the back
+							put("WheelL_2_Offset",new Vec3(-2.1838,0.873633,-3.39093)); //same as above but for second on same side
+						}
+					})
+					.setName("GTA Truck")
 				);
 		}//types stop here.
 	}; 
@@ -407,6 +431,7 @@ public class CarTypeRegistry {
 			put("TIFF",8);
 			put("TIOS",9);
 			put("Keisuke",12);
+			put("Guardy",13);
 		}
 	};
 	

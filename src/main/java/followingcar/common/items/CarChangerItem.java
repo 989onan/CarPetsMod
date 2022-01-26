@@ -1,5 +1,6 @@
 package followingcar.common.items;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import followingcar.core.init.CarTypeRegistry;
@@ -50,7 +51,12 @@ public class CarChangerItem extends Item{
 		tooltip.add(text);
 		
 		CompoundTag compoundtag = p_41421_.getOrCreateTag();
-		tooltip.add(new TextComponent("Selected car type is: "+CarTypeRegistry.CarTypes.get((int) compoundtag.getShort("CarType")).getName()));
+		if(CarTypeRegistry.CarTypes.get((int) compoundtag.getShort("CarType")) != null) {
+			tooltip.add(new TextComponent("Selected car type is: "+CarTypeRegistry.CarTypes.get((int) compoundtag.getShort("CarType")).getName()));
+		}
+		else {
+			tooltip.add(new TextComponent("Selected car type is: MISSING NO AHHHHHHHHHHHHHH"));
+		}
 	}
 	
 	@Override
@@ -65,8 +71,27 @@ public class CarChangerItem extends Item{
         if(player.isCrouching()) {
         	short cartype = compoundtag.getShort("CarType");
         	
-        	if(CarTypeRegistry.CarTypes.get(cartype+1) != null) {
+        	List<Integer> secretcartypes = new ArrayList<Integer>(){
+				private static final long serialVersionUID = 1L;
+
+				{
+        			add(13);
+        		}
+        	};
+        	
+        	if(CarTypeRegistry.CarTypes.get(cartype+1) != null && !secretcartypes.contains(cartype+1)) {
         		compoundtag.putShort("CarType",(short) (cartype+1));
+        	}
+        	else if(secretcartypes.contains(cartype+1)) {
+        		while(secretcartypes.contains(cartype+1)) {
+        			cartype += 1;
+        		}
+        		if(CarTypeRegistry.CarTypes.get(cartype+1) != null) {
+        			compoundtag.putShort("CarType",(short) (cartype+1));
+        		}
+        		else{
+            		compoundtag.putShort("CarType",(short) 0);
+            	}
         	}
         	else{
         		compoundtag.putShort("CarType",(short) 0);

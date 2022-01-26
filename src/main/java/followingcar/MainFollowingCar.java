@@ -79,6 +79,7 @@ public class MainFollowingCar {
 			add("Hibiki");
 			add("Kadrian");
 			add("Fumei");
+			add("Guardy");
 		}
 	};
 	
