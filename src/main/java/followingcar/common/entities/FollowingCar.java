@@ -415,29 +415,12 @@ public class FollowingCar extends TamableAnimal implements PlayerRideable{
 
 
 			float cntrlx = livingentity.zza;
-			float cntrly = livingentity.xxa;
+			//float cntrly = livingentity.xxa;
 
 
 			Vec3 motion = new Vec3(0,0,cntrlx).add(travelVector);
-			//
-			//this.setSpeed(1);
-			if(cntrlx == 0) {
-				this.setSpeed((float)(this.getSpeed()-(.03f*(Math.abs(this.getSpeed())/this.getSpeed()))));
-				
-				if(!(Math.abs(this.getSpeed()) <.1f)) {
-					motion = new Vec3(0,0,1).add(travelVector);
-				}
-				else {
-					motion = new Vec3(0,0,0);
-				}
-				
-				
-				
-				super.travel(motion);
-			}
-			this.setSpeed(this.getSpeed()+(Math.abs(cntrlx)*(CarTypeRegistry.CarTypes.get(this.getActualCarType()).getAcceleration()/1000)));
 			
-			this.setSpeed(Math.min(CarTypeRegistry.CarTypes.get(  this.getActualCarType()).getMaxSpeed()  ,  Math.abs(this.getSpeed())  )*(Math.abs(this.getSpeed())/this.getSpeed()));
+			this.setSpeed((CarTypeRegistry.CarTypes.get(  this.getActualCarType()).getMaxSpeed())/100);
 			
 			
 			this.setYRot(this.getYRot()+this.deltarotation);
