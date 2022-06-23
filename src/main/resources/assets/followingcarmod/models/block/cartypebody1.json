@@ -2,7 +2,9 @@
   "__comment": "Add the following line on the same level as a 'model' declaration. Also the texture type here doesn't matter.",
   "loader": "forge:obj",
   "flip-v": true,
-  "model": "followingcarmod:models/obj/cartypebody1model.obj",
+  "ambientToFullbright":false,
+  "diffuseLighting":true,
+  "model": "followingcarmod:models/obj/cartypebody1.obj",
   "textures": {
     "texture0": "minecraft:block/cobblestone" 
   }

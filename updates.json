@@ -1,13 +1,14 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/car-pets/files",
   "promos": {
-    "1.16.5-recommended":"1.6.0",
+    "1.16.5-recommended": "1.6.0",
     "1.17.1-latest": "1.4.2",
     // Declare the latest "bleeding-edge" version of your mod for the given Minecraft version
     "1.17.1-recommended": "1.4.2",
     // Declare the latest "stable" version of your mod for the given Minecraft version
     //...
     "1.18-recommended": "1.5.1",
-    "1.18.1-recommended": "1.6.0"
+    "1.18.1-recommended": "1.6.0",
+    "1.19-recommended": "1.7.0"
   }
 }

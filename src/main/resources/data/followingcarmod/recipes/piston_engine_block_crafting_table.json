@@ -1,0 +1,36 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "followingcarmod:piston"
+		},
+		{
+			"item": "minecraft:iron_block"
+		}
+	],
+	"result": {
+		"item": "followingcarmod:piston_engine_block",
+		"count": 1
+	}
+}

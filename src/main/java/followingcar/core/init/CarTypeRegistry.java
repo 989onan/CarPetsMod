@@ -3,6 +3,7 @@ package followingcar.core.init;
 import java.util.HashMap;
 
 import followingcar.common.util.CarType;
+import followingcar.config.FollowingCarConfig;
 import net.minecraft.world.phys.Vec3;
 
 public class CarTypeRegistry {
@@ -13,8 +14,7 @@ public class CarTypeRegistry {
 			//Cuda Plymouth (default)
 			put(0,
 					
-					new CarType("cartypebody0","cartypecolor0","cartypewheel0","high",//obj models
-							"textures/entities/livingcarcolor.png","textures/entities/livingcar.png") //block model
+					new CarType("cartypebody0","cartypecolor0","cartypewheel0","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 5.7F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -40,8 +40,7 @@ public class CarTypeRegistry {
 			
 			//AE86 Tureno (Kodachi)
 			put(1,
-					new CarType("cartypebody1","cartypecolor1","cartypewheel1","high",//obj models
-							"textures/entities/ae86color.png","textures/entities/ae86.png")//block model
+					new CarType("cartypebody1","cartypecolor1","cartypewheel1","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 8.6F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(4) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(5)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -66,8 +65,7 @@ public class CarTypeRegistry {
 			
 			//BMW I8 (Fumei)
 			put(2,
-					new CarType("cartypebody2","cartypecolor2","cartypewheel2","high",//obj models
-							null,null)//block model
+					new CarType("cartypebody2","cartypecolor2","cartypewheel2","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 4.2F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(2)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -93,8 +91,7 @@ public class CarTypeRegistry {
 			
 			//Hyundai Sonata 2007 (Amari)
 			put(3,
-					new CarType("hyundaisonata2007body","hyundaisonata2007color","hyundaisonata2007wheel","high",//obj models
-							null,null)//block model
+					new CarType("hyundaisonata2007body","hyundaisonata2007color","hyundaisonata2007wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 7.1F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -120,8 +117,7 @@ public class CarTypeRegistry {
 			
 			//Mazda RX8 (Mazzy)
 			put(4,
-					new CarType("mazdarx8body","mazdarx8color","mazdarx8wheel","high",//obj models
-							null,null)//block model
+					new CarType("mazdarx8body","mazdarx8color","mazdarx8wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 6.3F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(3)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -147,8 +143,7 @@ public class CarTypeRegistry {
 			
 			//Mercades Benz AMG GT
 			put(5,
-					new CarType("mercades_benz_amg_gt_body","mercades_benz_amg_gt_color","mercades_benz_amg_gt_wheel","high",//obj models
-							null,null)//block model
+					new CarType("mercades_benz_amg_gt_body","mercades_benz_amg_gt_color","mercades_benz_amg_gt_wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 3.7F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -173,15 +168,14 @@ public class CarTypeRegistry {
 			
 			//Mclaren Senna 
 			put(6,
-					new CarType("mcclaren_senna_body","mcclaren_senna_color","mcclaren_senna_wheel","high",//obj models
-							null,null)//block model
+					new CarType("mcclaren_senna_body","mcclaren_senna_color","mcclaren_senna_wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 2.8F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1.3F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
 					.setMaxSpeed(208F)//in miles per hour
 					.setPassengerOffsets(//in order from driver to first passenger to last passenger
 							new Vec3[] {//this also determines the max passengers.
-									new Vec3(-0.321351,0.682818,0.252496),new Vec3(0.321351,0.682818,0.252496)
+									new Vec3(-0.316057,0.247916,0.215689),new Vec3(0.316057,0.247916,0.215689)
 								}
 							
 							)
@@ -197,11 +191,9 @@ public class CarTypeRegistry {
 					.setName("Mclaren Senna")
 				);
 			
-			
 			//Chevy Tahoe 2007
 			put(7,
-					new CarType("chevy_tahoe_body","chevy_tahoe_color","chevy_tahoe_wheel","high",//obj models
-							null,null)//block model
+					new CarType("chevy_tahoe_body","chevy_tahoe_color","chevy_tahoe_wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 8.6F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -227,8 +219,7 @@ public class CarTypeRegistry {
 			
 			//Lamborghini Gallardo 
 			put(8,
-					new CarType("lamborghini_gallardo_body","lamborghini_gallardo_color","lamborghini_gallardo_wheel","high",//obj models
-							null,null)//block model
+					new CarType("lamborghini_gallardo_body","lamborghini_gallardo_color","lamborghini_gallardo_wheel","high")//model
 					.setAcceleration((62-0)/ /*X Seconds:*/ 3.7F) //0-62mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1.1F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -253,8 +244,7 @@ public class CarTypeRegistry {
 			
 			//Lamborghini Hurrican
 			put(9,
-					new CarType("lamborghini_hurrican_body","lamborghini_hurrican_color","lamborghini_hurrican_wheel","high",//obj models
-							null,null)//block model
+					new CarType("lamborghini_hurrican_body","lamborghini_hurrican_color","lamborghini_hurrican_wheel","high")//model
 					.setAcceleration((62-0)/ /*X Seconds:*/ 3.6F) //0-62mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -280,8 +270,7 @@ public class CarTypeRegistry {
 			
 			//Ford F150 [year 2007?]
 			put(10,
-					new CarType("ford_f150_body","ford_f150_color","ford_f150_wheel","high",//obj models
-							null,null)//block model
+					new CarType("ford_f150_body","ford_f150_color","ford_f150_wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 6.6F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1.3F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -308,8 +297,7 @@ public class CarTypeRegistry {
 			
 			//Ferrari F50 
 			put(11,
-					new CarType("ferrari_f50_body","ferrari_f50_color","ferrari_f50_wheel","high",//obj models
-							null,null)//block model
+					new CarType("ferrari_f50_body","ferrari_f50_color","ferrari_f50_wheel","high")//model
 					.setAcceleration((60-0)/ /*X Seconds:*/ 3.7F) //0-60mph in X seconds.
 					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
 					.setDriftMultiplier(1.5F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
@@ -330,6 +318,52 @@ public class CarTypeRegistry {
 						}
 					})
 					.setName("Ferrari F50")
+				);
+			put(12,
+					new CarType("mazda_rx7_fd_body","mazda_rx7_fd_color","mazda_rx7_fd_wheel","high")//model
+					.setAcceleration((60-0)/ /*X Seconds:*/ 4.9F) //0-60mph in X seconds.
+					.setRollFrictionMultiplier(2) // 1 - infinity slipperiness. decimal = constantly braking
+					.setDriftMultiplier(3.5F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
+					.setMaxSpeed(160F)//in miles per hour
+					.setPassengerOffsets(//in order from driver to first passenger to last passenger
+							new Vec3[] {//this also determines the max passengers.
+									new Vec3(-0.331877,-0.257305,0.450663),new Vec3(0.331877,-0.257305,0.450663)
+								}
+							
+							)
+					.setWheelOffsets(new HashMap<String,Vec3>(){private static final long serialVersionUID = -6323696599663271312L;
+						{
+							//this is where the model values go
+							//all values are in degrees and meters in the Blender3D editor
+							put("WheelLRot",new Vec3(0F,0F,0F)); //wheel default rotation
+							put("WheelL_1_Offset",new Vec3(-0.785292,0.314245,1.18841)); //position of the first wheel (usually front) on the left looking at the car from the back
+							put("WheelL_2_Offset",new Vec3(-0.785292,0.314245,-1.17647)); //same as above but for second on same side
+						}
+					})
+					.setName("Mazda RX7 FD")
+				);
+			put(13,
+					new CarType("gta_truck_body","gta_truck_color","gta_truck_wheel","high")//model
+					.setAcceleration((60-0)/ /*X Seconds:*/ 10F) //0-60mph in X seconds.
+					.setRollFrictionMultiplier(2.5F) // 1 - infinity slipperiness. decimal = constantly braking
+					.setDriftMultiplier(4F)//bigger means more drift. 15 is general max but it can go higher with not ideal results. (higher than 15 not tested)
+					.setMaxSpeed(220F)//in miles per hour
+					.setPassengerOffsets(//in order from driver to first passenger to last passenger
+							new Vec3[] {//this also determines the max passengers.
+									new Vec3(0F,-2.15661F,2.05754F), new Vec3(0F,-4.27734F,2.05754F)
+								}
+							
+							)
+					.setWheelOffsets(new HashMap<String,Vec3>(){private static final long serialVersionUID = -6323696599663271312L;
+						{
+							//this is where the model values go
+							//all values are in degrees and meters in the Blender3D editor
+							put("WheelLRot",new Vec3(0F,0F,0F)); //wheel default rotation
+							put("WheelL_1_Offset",new Vec3(-2.1838,0.873633,3.57503)); //position of the first wheel (usually front) on the left looking at the car from the back
+							put("WheelL_2_Offset",new Vec3(-2.1838,0.873633,-3.39093)); //same as above but for second on same side
+						}
+					})
+					.setName("GTA Truck")
 				);
 		}//types stop here.
 	}; 
@@ -365,8 +399,8 @@ public class CarTypeRegistry {
 	*/
 	
 	
-	//determines the scale for all cars. If this becomes different on the client due to another mod changing it client side only, expect visual bugs!
-	public static final double CarScale = 1.5;
+	//determines the scale for all cars. If this becomes different on the client due to another mod changing it client side only, or server vs client having different sizes, expect visual bugs!
+	public static double CarScale = FollowingCarConfig.userealsize.get() ? 1 : 1.5;
 	public static final float WheelAngle = 30;//degrees wheels should rotate
 	
 	//custom names to make a car type appear if it is named this. It can also become one of these
@@ -382,6 +416,8 @@ public class CarTypeRegistry {
 			put("Mazzy",4);
 			put("TIFF",8);
 			put("TIOS",9);
+			put("Keisuke",12);
+			put("Guardy",13);
 		}
 	};
 	

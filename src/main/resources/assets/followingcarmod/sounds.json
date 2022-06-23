@@ -1,0 +1,27 @@
+{
+	"car_purr": {
+		"subtitle": "followingcarmod.subtitle.car_purrs",
+		"sounds": [{
+	        "name": "followingcarmod:car_purr",
+	        "stream": true
+	      }
+	    ]
+	},
+	"car_rev": {
+		"subtitle":"followingcarmod.subtitle.car_revs",
+		"sounds": [{
+	        "name": "followingcarmod:car_rev",
+	        "stream": true
+	      }
+	    ]
+	},
+	"car_hurt": {
+		"subtitle": "followingcarmod.subtitle.car_hurt",
+		"sounds": [{
+	        "name": "followingcarmod:car_hurt",
+	        "stream": true
+	      }
+	    ]
+	}
+	
+}

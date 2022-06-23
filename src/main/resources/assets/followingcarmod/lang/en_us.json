@@ -3,6 +3,22 @@
 	"item.followingcarmod.gascan": "Gas Can",
 	"item.followingcarmod.soul": "Soul",
 	"item.followingcarmod.wheel": "Wheel",
-	"entity.followingcarmod.following_car": "Car Pet"
+	
+	"item.followingcarmod.piston":"Piston",
+	"item.followingcarmod.piston_engine_block":"Engine Block",
+	"item.followingcarmod.battery":"Battery",
+	"item.followingcarmod.wire":"Wire",
+	"item.followingcarmod.acid":"Acid",
+	"item.followingcarmod.dead_engine":"Dead Engine",
+	"item.followingcarmod.alive_engine":"Alive Engine",
+	"item.followingcarmod.car_changer":"Car Type Changer",
+	"item.followingcarmod.dye_bundle":"Dye Bundle",
+	
+	"entity.followingcarmod.following_car": "Car Pet",
+	
+	"followingcarmod.subtitle.car_hurt":"Car Pet Hurt",
+	"followingcarmod.subtitle.car_purrs": "Car Pet Purrs",
+	"followingcarmod.subtitle.car_revs": "Car Pet Engine",
+	"followingcarmod.subtitle.car_cutenoise": "Car Pet Rumbles Cutely"
 	
 }

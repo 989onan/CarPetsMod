@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "followingcarmod:battery"
+		},
+		{
+			"item": "followingcarmod:soul"
+		},
+		{
+			"item": "followingcarmod:wire"
+		}
+	],
+	"result": {
+		"item": "followingcarmod:car_changer",
+		"count": 1
+	}
+}
